@@ -591,6 +591,16 @@ body {
       '}\n' +
       '}';
   expectCss(css, expected);
+
+  // Test that operators can't be mixed without parentheses.
+  css = '@supports (a: 1) and (b: 2) or (c: 3) {}';
+  var errors = <Message>[];
+  var styleSheet = parseCss(css, errors: errors, opts: simpleOptions);
+  expect(styleSheet, isNotNull);
+  expect(errors, isNotEmpty);
+  expect(errors.first.message,
+      "Operators can't be mixed without a layer of parentheses");
+  expect(errors.first.span.text, 'or');
 }
 
 void testFontFace() {

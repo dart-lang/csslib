@@ -1056,8 +1056,7 @@ class _Parser {
   }
 
   SupportsCondition processSupportsCondition() {
-    var kind = _peek();
-    if (kind == TokenKind.IDENTIFIER) {
+    if (_peekKind(TokenKind.IDENTIFIER)) {
       return processSupportsNegation();
     }
 

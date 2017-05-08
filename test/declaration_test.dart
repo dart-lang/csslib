@@ -454,8 +454,19 @@ void testMediaQueries() {
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(stylesheet), generated);
 
-  var css = '@media all AND (tranform-3d), (-webkit-transform-3d) {\n}';
+  var css = '@media (min-device-width:400px) {\n}';
   expectCss(css, css);
+
+  css = '@media all AND (tranform-3d), (-webkit-transform-3d) {\n}';
+  expectCss(css, css);
+
+  // Test that AND operator is required between media type and expressions.
+  css = '@media screen (min-device-width:400px';
+  stylesheet = parseCss(css, errors: errors..clear(), opts: simpleOptions);
+  expect(errors, isNotEmpty);
+  expect(
+      errors.first.message, contains('expected { after media before ruleset'));
+  expect(errors.first.span.text, '(');
 }
 
 void testMozDocument() {

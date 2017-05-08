@@ -375,22 +375,14 @@ class _Parser {
   List<MediaQuery> processMediaQueryList() {
     var mediaQueries = <MediaQuery>[];
 
-    bool firstTime = true;
-    var mediaQuery;
     do {
-      mediaQuery = processMediaQuery();
+      var mediaQuery = processMediaQuery();
       if (mediaQuery != null) {
         mediaQueries.add(mediaQuery);
-        firstTime = false;
-        continue;
+      } else {
+        break;
       }
-
-      // Any more more media types separated by comma.
-      if (!_maybeEat(TokenKind.COMMA)) break;
-
-      // Yep more media types start again.
-      firstTime = true;
-    } while ((!firstTime && mediaQuery != null) || firstTime);
+    } while (_maybeEat(TokenKind.COMMA));
 
     return mediaQueries;
   }

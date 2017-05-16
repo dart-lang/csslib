@@ -216,7 +216,7 @@ class _Parser {
         productions.add(directive);
         _maybeEat(TokenKind.SEMICOLON);
       } else {
-        RuleSet ruleset = processRuleSet();
+        final ruleset = processRuleSet();
         if (ruleset != null) {
           productions.add(ruleset);
         } else {
@@ -526,7 +526,7 @@ class _Parser {
         List<TreeNode> rulesets = [];
         if (_maybeEat(TokenKind.LBRACE)) {
           while (!_maybeEat(TokenKind.END_OF_FILE)) {
-            RuleSet ruleset = processRuleSet();
+            final ruleset = processRuleSet();
             if (ruleset == null) break;
             rulesets.add(ruleset);
           }
@@ -545,7 +545,7 @@ class _Parser {
         List<TreeNode> rulesets = [];
         if (_maybeEat(TokenKind.LBRACE)) {
           while (!_maybeEat(TokenKind.END_OF_FILE)) {
-            RuleSet ruleset = processRuleSet();
+            final ruleset = processRuleSet();
             if (ruleset == null) break;
             rulesets.add(ruleset);
           }
@@ -708,7 +708,7 @@ class _Parser {
 
         start = _peekToken.span;
         while (!_maybeEat(TokenKind.END_OF_FILE)) {
-          RuleSet ruleset = processRuleSet();
+          final ruleset = processRuleSet();
           if (ruleset == null) {
             break;
           }
@@ -1121,8 +1121,12 @@ class _Parser {
     return new ViewportDirective(name, declarations, _makeSpan(start));
   }
 
-  RuleSet processRuleSet([SelectorGroup selectorGroup]) {
+  TreeNode processRuleSet([SelectorGroup selectorGroup]) {
     if (selectorGroup == null) {
+      final directive = processDirective();
+      if (directive != null) {
+        return directive;
+      }
       selectorGroup = processSelectorGroup();
     }
     if (selectorGroup != null) {
@@ -1135,11 +1139,6 @@ class _Parser {
   List<TreeNode> processGroupRuleBody() {
     var nodes = <TreeNode>[];
     while (!(_peekKind(TokenKind.RBRACE) || _peekKind(TokenKind.END_OF_FILE))) {
-      var directive = processDirective();
-      if (directive != null) {
-        nodes.add(directive);
-        continue;
-      }
       var ruleSet = processRuleSet();
       if (ruleSet != null) {
         nodes.add(ruleSet);

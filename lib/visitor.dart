@@ -190,18 +190,12 @@ class Visitor implements VisitorBase {
   }
 
   visitMediaDirective(MediaDirective node) {
-    for (var mediaQuery in node.mediaQueries) {
-      visitMediaQuery(mediaQuery);
-    }
-    for (var ruleset in node.rulesets) {
-      visitRuleSet(ruleset);
-    }
+    _visitNodeList(node.mediaQueries);
+    _visitNodeList(node.rulesets);
   }
 
   visitHostDirective(HostDirective node) {
-    for (var ruleset in node.rulesets) {
-      visitRuleSet(ruleset);
-    }
+    _visitNodeList(node.rulesets);
   }
 
   visitPageDirective(PageDirective node) {

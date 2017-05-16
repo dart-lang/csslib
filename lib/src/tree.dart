@@ -638,7 +638,7 @@ class MediaQuery extends TreeNode {
 
 class MediaDirective extends Directive {
   final List<MediaQuery> mediaQueries;
-  final List<RuleSet> rulesets;
+  final List<TreeNode> rulesets;
 
   MediaDirective(this.mediaQueries, this.rulesets, SourceSpan span)
       : super(span);
@@ -659,12 +659,12 @@ class MediaDirective extends Directive {
 }
 
 class HostDirective extends Directive {
-  final List<RuleSet> rulesets;
+  final List<TreeNode> rulesets;
 
   HostDirective(this.rulesets, SourceSpan span) : super(span);
 
   HostDirective clone() {
-    var cloneRulesets = <RuleSet>[];
+    var cloneRulesets = <TreeNode>[];
     for (var ruleset in rulesets) {
       cloneRulesets.add(ruleset.clone());
     }
@@ -771,7 +771,7 @@ class FontFaceDirective extends Directive {
 
 class StyletDirective extends Directive {
   final String dartClassName;
-  final List<RuleSet> rulesets;
+  final List<TreeNode> rulesets;
 
   StyletDirective(this.dartClassName, this.rulesets, SourceSpan span)
       : super(span);
@@ -780,7 +780,7 @@ class StyletDirective extends Directive {
   bool get isExtension => true;
 
   StyletDirective clone() {
-    var cloneRulesets = <RuleSet>[];
+    var cloneRulesets = <TreeNode>[];
     for (var ruleset in rulesets) {
       cloneRulesets.add(ruleset.clone());
     }

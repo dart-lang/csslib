@@ -10,8 +10,7 @@ const testOptions = const PreprocessorOptions(
     useColors: false,
     checked: false,
     warningsAsErrors: true,
-    inputFile: 'memory'
-);
+    inputFile: 'memory');
 
 void testCSSFile(File cssFile) {
   final errors = <Message>[];
@@ -25,8 +24,7 @@ void testCSSFile(File cssFile) {
 main() {
   var cssDir = new Directory.fromUri(Platform.script.resolve('./examples'));
   for (var element in cssDir.listSync())
-    if(element is File && element.uri.pathSegments.last.endsWith('.css')) {
-
-    test(element.uri.pathSegments.last, () => testCSSFile(element));
-  }
+    if (element is File && element.uri.pathSegments.last.endsWith('.css')) {
+      test(element.uri.pathSegments.last, () => testCSSFile(element));
+    }
 }

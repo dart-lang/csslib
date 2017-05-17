@@ -191,11 +191,11 @@ class Visitor implements VisitorBase {
 
   visitMediaDirective(MediaDirective node) {
     _visitNodeList(node.mediaQueries);
-    _visitNodeList(node.rulesets);
+    _visitNodeList(node.rules);
   }
 
   visitHostDirective(HostDirective node) {
-    _visitNodeList(node.rulesets);
+    _visitNodeList(node.rules);
   }
 
   visitPageDirective(PageDirective node) {
@@ -231,7 +231,7 @@ class Visitor implements VisitorBase {
   }
 
   visitStyletDirective(StyletDirective node) {
-    _visitNodeList(node.rulesets);
+    _visitNodeList(node.rules);
   }
 
   visitNamespaceDirective(NamespaceDirective node) {}

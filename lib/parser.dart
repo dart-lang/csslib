@@ -211,17 +211,11 @@ class _Parser {
     var start = _peekToken.span;
     while (!_maybeEat(TokenKind.END_OF_FILE) && !_peekKind(TokenKind.RBRACE)) {
       // TODO(terry): Need to handle charset.
-      var directive = processDirective();
-      if (directive != null) {
-        productions.add(directive);
-        _maybeEat(TokenKind.SEMICOLON);
+      final rule = processRule();
+      if (rule != null) {
+        productions.add(rule);
       } else {
-        final ruleset = processRuleSet();
-        if (ruleset != null) {
-          productions.add(ruleset);
-        } else {
-          break;
-        }
+        break;
       }
     }
 
@@ -523,12 +517,12 @@ class _Parser {
         // Any medias?
         var media = processMediaQueryList();
 
-        List<TreeNode> rulesets = [];
+        List<TreeNode> rules = [];
         if (_maybeEat(TokenKind.LBRACE)) {
           while (!_maybeEat(TokenKind.END_OF_FILE)) {
-            final ruleset = processRuleSet();
-            if (ruleset == null) break;
-            rulesets.add(ruleset);
+            final rule = processRule();
+            if (rule == null) break;
+            rules.add(rule);
           }
 
           if (!_maybeEat(TokenKind.RBRACE)) {
@@ -537,17 +531,17 @@ class _Parser {
         } else {
           _error('expected { after media before ruleset', _peekToken.span);
         }
-        return new MediaDirective(media, rulesets, _makeSpan(start));
+        return new MediaDirective(media, rules, _makeSpan(start));
 
       case TokenKind.DIRECTIVE_HOST:
         _next();
 
-        List<TreeNode> rulesets = [];
+        List<TreeNode> rules = [];
         if (_maybeEat(TokenKind.LBRACE)) {
           while (!_maybeEat(TokenKind.END_OF_FILE)) {
-            final ruleset = processRuleSet();
-            if (ruleset == null) break;
-            rulesets.add(ruleset);
+            final rule = processRule();
+            if (rule == null) break;
+            rules.add(rule);
           }
 
           if (!_maybeEat(TokenKind.RBRACE)) {
@@ -556,7 +550,7 @@ class _Parser {
         } else {
           _error('expected { after host before ruleset', _peekToken.span);
         }
-        return new HostDirective(rulesets, _makeSpan(start));
+        return new HostDirective(rules, _makeSpan(start));
 
       case TokenKind.DIRECTIVE_PAGE:
         /*
@@ -708,11 +702,11 @@ class _Parser {
 
         start = _peekToken.span;
         while (!_maybeEat(TokenKind.END_OF_FILE)) {
-          final ruleset = processRuleSet();
-          if (ruleset == null) {
+          final rule = processRule();
+          if (rule == null) {
             break;
           }
-          productions.add(ruleset);
+          productions.add(rule);
         }
 
         _eat(TokenKind.RBRACE);
@@ -1121,10 +1115,11 @@ class _Parser {
     return new ViewportDirective(name, declarations, _makeSpan(start));
   }
 
-  TreeNode processRuleSet([SelectorGroup selectorGroup]) {
+  TreeNode processRule([SelectorGroup selectorGroup]) {
     if (selectorGroup == null) {
       final directive = processDirective();
       if (directive != null) {
+        _maybeEat(TokenKind.SEMICOLON);
         return directive;
       }
       selectorGroup = processSelectorGroup();
@@ -1139,9 +1134,9 @@ class _Parser {
   List<TreeNode> processGroupRuleBody() {
     var nodes = <TreeNode>[];
     while (!(_peekKind(TokenKind.RBRACE) || _peekKind(TokenKind.END_OF_FILE))) {
-      var ruleSet = processRuleSet();
-      if (ruleSet != null) {
-        nodes.add(ruleSet);
+      var rule = processRule();
+      if (rule != null) {
+        nodes.add(rule);
         continue;
       }
       break;
@@ -1210,7 +1205,7 @@ class _Parser {
       var selectorGroup = _nestedSelector();
       while (selectorGroup != null) {
         // Nested selector so process as a ruleset.
-        var ruleset = processRuleSet(selectorGroup);
+        var ruleset = processRule(selectorGroup);
         decls.add(ruleset);
         selectorGroup = _nestedSelector();
       }

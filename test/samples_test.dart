@@ -26,8 +26,7 @@ main() {
   var cssDir = new Directory.fromUri(Platform.script.resolve('./examples'));
   for (var element in cssDir.listSync())
     if(element is File && element.uri.pathSegments.last.endsWith('.css')) {
-    
-    File cssFile = element;
-    test(cssFile.uri.pathSegments.last, () => testCSSFile(cssFile));
+
+    test(element.uri.pathSegments.last, () => testCSSFile(element));
   }
 }

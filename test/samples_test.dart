@@ -1,5 +1,6 @@
 library samples_test;
 
+import 'dart:mirrors';
 import 'dart:io';
 import 'package:test/test.dart';
 import 'package:csslib/parser.dart';
@@ -22,7 +23,8 @@ void testCSSFile(File cssFile) {
 }
 
 main() {
-  var cssDir = new Directory.fromUri(Platform.script.resolve('./examples'));
+  final libraryUri = currentMirrorSystem().findLibrary(#samples_test).uri;
+  final cssDir = new Directory.fromUri(libraryUri.resolve('examples'));
   for (var element in cssDir.listSync())
     if (element is File && element.uri.pathSegments.last.endsWith('.css')) {
       test(element.uri.pathSegments.last, () => testCSSFile(element));

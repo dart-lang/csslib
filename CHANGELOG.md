@@ -1,3 +1,8 @@
+## 0.14.2+1
+
+* Updated SDK version to 2.0.0-dev.17.0. 
+* Stop using deprecated constants.
+
 ## 0.14.2
 
 * Fixed Dart 2 runtime failure.

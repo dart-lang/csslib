@@ -29,7 +29,7 @@ class CssPrinter extends Visitor {
   /** Returns the output buffer. */
   String toString() => _buff.toString().trim();
 
-  String get _newLine => prettyPrint ? '\n' : ' ';
+  String get _newLine => prettyPrint ? '\n' : '';
   String get _sp => prettyPrint ? ' ' : '';
 
   // TODO(terry): When adding obfuscation we'll need isOptimized (compact w/
@@ -170,7 +170,7 @@ class CssPrinter extends Visitor {
 
     var declsMargin = node._declsMargin;
     var declsMarginLength = declsMargin.length;
-    emit(' {$_newLine');
+    emit('$_sp{$_newLine');
     for (var i = 0; i < declsMarginLength; i++) {
       declsMargin[i].visit(this);
     }
@@ -282,7 +282,7 @@ class CssPrinter extends Visitor {
   void visitRuleSet(RuleSet node) {
     emit("$_newLine");
     node._selectorGroup.visit(this);
-    emit(" {$_newLine");
+    emit("$_sp{$_newLine");
     node._declarationGroup.visit(this);
     emit("}");
   }
@@ -303,7 +303,7 @@ class CssPrinter extends Visitor {
     var margin_sym_name =
         TokenKind.idToValue(TokenKind.MARGIN_DIRECTIVES, node.margin_sym);
 
-    emit("@$margin_sym_name {$_newLine");
+    emit("@$margin_sym_name$_sp{$_newLine");
 
     visitDeclarationGroup(node);
 

@@ -1,7 +1,12 @@
-## 0.14.2+1
+## 0.14.4
 
+* Reduced whitespace in compact output for the `@page` at-rule and margin boxes.
 * Updated SDK version to 2.0.0-dev.17.0.
 * Stop using deprecated constants.
+
+## 0.14.3
+
+* Reduced the amount of whitespace in compact output around braces.
 
 ## 0.14.2
 

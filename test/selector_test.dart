@@ -83,8 +83,7 @@ void testSelectorFailures() {
       '  ╷\n'
       '1 │ .foobar .1a-story .xyzzy\n'
       '  │         ^^\n'
-      '  ╵'
-      );
+      '  ╵');
 
   selector(':host()', errors: errors..clear());
   expect(
@@ -93,8 +92,7 @@ void testSelectorFailures() {
       '  ╷\n'
       '1 │ :host()\n'
       '  │       ^\n'
-      '  ╵'
-      );
+      '  ╵');
 }
 
 main() {

@@ -268,8 +268,7 @@ void testBadUnicode() {
       '  ╷\n'
       '3 │   unicode-range: U+400-200;\n'
       '  │                    ^^^^^^^\n'
-      '  ╵'
-      );
+      '  ╵');
 
   final String input2 = '''
 @font-face {
@@ -286,8 +285,7 @@ void testBadUnicode() {
       '  ╷\n'
       '3 │   unicode-range: U+12FFFF;\n'
       '  │                    ^^^^^^\n'
-      '  ╵'
-      );
+      '  ╵');
 }
 
 void testBadNesting() {

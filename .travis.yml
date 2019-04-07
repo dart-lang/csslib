@@ -7,10 +7,13 @@ dart:
 dart_task:
   - test: --platform vm
   - test: --platform firefox -j 1
-  - dartanalyzer: --fatal-infos --fatal-warnings .
 
 matrix:
   include:
+    - dart: dev
+      dartanalyzer: --fatal-infos --fatal-warnings .
+    - dart: stable
+      dartanalyzer: --fatal-warnings .
     - dart: dev
       dart_task: dartfmt
 

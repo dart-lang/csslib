@@ -1,10 +1,9 @@
 ## 0.15.0
 
-**BREAKING**
+- **BREAKING**
   - Removed `css` executable from `bin` directory.
   - Removed the deprecated `css.dart` library.
   - `Message.level` is now of type `MessageLevel` defined in this package.
-
 - Removed dependencies on `package:args` and `package:logging`.
 - Require Dart SDK `>=2.1.0`.
 

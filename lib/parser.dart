@@ -185,6 +185,21 @@ final _legacyPseudoElements = new Set<String>.from(const [
   'first-line',
 ]);
 
+// CSS3 functional pseudo-classes (https://www.w3.org/TR/2018/REC-selectors-3-20181106/#selectors)
+final _functionalPseudoClasses = new Set<String>.from(const [
+  'nth-child',
+  'nth-last-child',
+  'nth-of-type',
+  'nth-last-of-type',
+  'lang',
+  'not',
+]);
+
+final _compoundSelectors = new Set<String>.from(const [
+  'host',
+  'host-context',
+]);
+
 /** A simple recursive descent parser for CSS. */
 class _Parser {
   final Tokenizer tokenizer;
@@ -1617,6 +1632,11 @@ class _Parser {
 
     // Functional pseudo?
     if (_peekToken.kind == TokenKind.LPAREN) {
+
+      if (pseudoElement || (!_functionalPseudoClasses.contains(name) && !_compoundSelectors.contains(name))) {
+        return null;
+      }
+
       if (!pseudoElement && name == 'not') {
         _eat(TokenKind.LPAREN);
 
@@ -1625,7 +1645,7 @@ class _Parser {
 
         _eat(TokenKind.RPAREN);
         return new NegationSelector(negArg, _makeSpan(start));
-      } else if (!pseudoElement && (name == 'host' || name == 'host-context')) {
+      } else if (!pseudoElement && _compoundSelectors.contains(name)) {
         _eat(TokenKind.LPAREN);
         var selector = processCompoundSelector();
         if (selector == null) {

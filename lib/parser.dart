@@ -1588,8 +1588,9 @@ class _Parser {
 
     // Functional pseudo?
     if (_peekToken.kind == TokenKind.LPAREN) {
-
-      if (pseudoElement || (!_functionalPseudoClasses.contains(name) && !_compoundSelectors.contains(name))) {
+      if (pseudoElement ||
+          (!_functionalPseudoClasses.contains(name) &&
+              !_compoundSelectors.contains(name))) {
         return null;
       }
 

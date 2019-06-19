@@ -2,26 +2,24 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library csslib.parser;
-
 import 'dart:math' as math;
 
 import 'package:source_span/source_span.dart';
 
 import 'src/messages.dart';
-import 'src/options.dart';
+import 'src/preprocessor_options.dart';
 import 'visitor.dart';
 
-export 'src/messages.dart' show Message;
-export 'src/options.dart';
+export 'src/messages.dart' show Message, MessageLevel;
+export 'src/preprocessor_options.dart';
 
 part 'src/analyzer.dart';
 part 'src/polyfill.dart';
 part 'src/property.dart';
 part 'src/token.dart';
-part 'src/tokenizer_base.dart';
+part 'src/token_kind.dart';
 part 'src/tokenizer.dart';
-part 'src/tokenkind.dart';
+part 'src/tokenizer_base.dart';
 
 enum ClauseType {
   none,
@@ -29,7 +27,7 @@ enum ClauseType {
   disjunction,
 }
 
-/** Used for parser lookup ahead (used for nested selectors Less support). */
+/// Used for parser lookup ahead (used for nested selectors Less support).
 class ParserState extends TokenizerState {
   final Token peekToken;
   final Token previousToken;
@@ -43,23 +41,23 @@ void _createMessages({List<Message> errors, PreprocessorOptions options}) {
   if (errors == null) errors = [];
 
   if (options == null) {
-    options = new PreprocessorOptions(useColors: false, inputFile: 'memory');
+    options = PreprocessorOptions(useColors: false, inputFile: 'memory');
   }
 
-  messages = new Messages(options: options, printHandler: errors.add);
+  messages = Messages(options: options, printHandler: errors.add);
 }
 
-/** CSS checked mode enabled. */
+/// CSS checked mode enabled.
 bool get isChecked => messages.options.checked;
 
 // TODO(terry): Remove nested name parameter.
-/** Parse and analyze the CSS file. */
+/// Parse and analyze the CSS file.
 StyleSheet compile(input,
     {List<Message> errors,
     PreprocessorOptions options,
-    bool nested: true,
-    bool polyfill: false,
-    List<StyleSheet> includes: null}) {
+    bool nested = true,
+    bool polyfill = false,
+    List<StyleSheet> includes}) {
   if (includes == null) {
     includes = [];
   }
@@ -68,55 +66,50 @@ StyleSheet compile(input,
 
   _createMessages(errors: errors, options: options);
 
-  var file = new SourceFile.fromString(source);
+  var file = SourceFile.fromString(source);
 
-  var tree = new _Parser(file, source).parse();
+  var tree = _Parser(file, source).parse();
 
   analyze([tree], errors: errors, options: options);
 
   if (polyfill) {
-    var processCss = new PolyFill(messages);
+    var processCss = PolyFill(messages);
     processCss.process(tree, includes: includes);
   }
 
   return tree;
 }
 
-/** Analyze the CSS file. */
+/// Analyze the CSS file.
 void analyze(List<StyleSheet> styleSheets,
     {List<Message> errors, PreprocessorOptions options}) {
   _createMessages(errors: errors, options: options);
-  new Analyzer(styleSheets, messages).run();
+  Analyzer(styleSheets, messages).run();
 }
 
-/**
- * Parse the [input] CSS stylesheet into a tree. The [input] can be a [String],
- * or [List<int>] of bytes and returns a [StyleSheet] AST.  The optional
- * [errors] list will contain each error/warning as a [Message].
- */
+/// Parse the [input] CSS stylesheet into a tree. The [input] can be a [String],
+/// or [List<int>] of bytes and returns a [StyleSheet] AST.  The optional
+/// [errors] list will contain each error/warning as a [Message].
 StyleSheet parse(input, {List<Message> errors, PreprocessorOptions options}) {
   var source = _inputAsString(input);
 
   _createMessages(errors: errors, options: options);
 
-  var file = new SourceFile.fromString(source);
-  return new _Parser(file, source).parse();
+  var file = SourceFile.fromString(source);
+  return _Parser(file, source).parse();
 }
 
-/**
- * Parse the [input] CSS selector into a tree. The [input] can be a [String],
- * or [List<int>] of bytes and returns a [StyleSheet] AST.  The optional
- * [errors] list will contain each error/warning as a [Message].
- */
+/// Parse the [input] CSS selector into a tree. The [input] can be a [String],
+/// or [List<int>] of bytes and returns a [StyleSheet] AST.  The optional
+/// [errors] list will contain each error/warning as a [Message].
 // TODO(jmesserly): should rename "parseSelector" and return Selector
 StyleSheet selector(input, {List<Message> errors}) {
   var source = _inputAsString(input);
 
   _createMessages(errors: errors);
 
-  var file = new SourceFile.fromString(source);
-  return (new _Parser(file, source)..tokenizer.inSelector = true)
-      .parseSelector();
+  var file = SourceFile.fromString(source);
+  return (_Parser(file, source)..tokenizer.inSelector = true).parseSelector();
 }
 
 SelectorGroup parseSelectorGroup(input, {List<Message> errors}) {
@@ -124,10 +117,11 @@ SelectorGroup parseSelectorGroup(input, {List<Message> errors}) {
 
   _createMessages(errors: errors);
 
-  var file = new SourceFile.fromString(source);
-  return (new _Parser(file, source)
-        // TODO(jmesserly): this fix should be applied to the parser. It's tricky
-        // because by the time the flag is set one token has already been fetched.
+  var file = SourceFile.fromString(source);
+  return (_Parser(file, source)
+        // TODO(jmesserly): this fix should be applied to the parser. It's
+        // tricky because by the time the flag is set one token has already
+        // been fetched.
         ..tokenizer.inSelector = true)
       .processSelectorGroup();
 }
@@ -152,10 +146,10 @@ String _inputAsString(input) {
     // See encoding helpers at: package:html5lib/lib/src/char_encodings.dart
     // These helpers can decode in different formats given an encoding name
     // (mostly unicode, ascii, windows-1252 which is html5 default encoding).
-    source = new String.fromCharCodes(input as List<int>);
+    source = String.fromCharCodes(input as List<int>);
   } else {
     // TODO(terry): Support RandomAccessFile using console.
-    throw new ArgumentError("'source' must be a String or "
+    throw ArgumentError("'source' must be a String or "
         "List<int> (of bytes). RandomAccessFile not supported from this "
         "simple interface");
   }
@@ -165,20 +159,20 @@ String _inputAsString(input) {
 
 // TODO(terry): Consider removing this class when all usages can be eliminated
 //               or replaced with compile API.
-/** Public parsing interface for csslib. */
+/// Public parsing interface for csslib.
 class Parser {
   final _Parser _parser;
 
   // TODO(jmesserly): having file and text is redundant.
   // TODO(rnystrom): baseUrl isn't used. Remove from API.
-  Parser(SourceFile file, String text, {int start: 0, String baseUrl})
-      : _parser = new _Parser(file, text, start: start);
+  Parser(SourceFile file, String text, {int start = 0, String baseUrl})
+      : _parser = _Parser(file, text, start: start);
 
   StyleSheet parse() => _parser.parse();
 }
 
 // CSS2.1 pseudo-elements which were defined with a single ':'.
-final _legacyPseudoElements = new Set<String>.from(const [
+final _legacyPseudoElements = Set<String>.from(const [
   'after',
   'before',
   'first-letter',
@@ -200,26 +194,24 @@ final _compoundSelectors = new Set<String>.from(const [
   'host-context',
 ]);
 
-/** A simple recursive descent parser for CSS. */
+/// A simple recursive descent parser for CSS.
 class _Parser {
   final Tokenizer tokenizer;
 
-  /**
-   * File containing the source being parsed, used to report errors with
-   * source-span locations.
-   */
+  /// File containing the source being parsed, used to report errors with
+  /// source-span locations.
   final SourceFile file;
 
   Token _previousToken;
   Token _peekToken;
 
-  _Parser(SourceFile file, String text, {int start: 0})
+  _Parser(SourceFile file, String text, {int start = 0})
       : this.file = file,
-        tokenizer = new Tokenizer(file, text, true, start) {
+        tokenizer = Tokenizer(file, text, true, start) {
     _peekToken = tokenizer.next();
   }
 
-  /** Main entry point for parsing an entire CSS file. */
+  /// Main entry point for parsing an entire CSS file.
   StyleSheet parse() {
     List<TreeNode> productions = [];
 
@@ -236,10 +228,10 @@ class _Parser {
 
     checkEndOfFile();
 
-    return new StyleSheet(productions, _makeSpan(start));
+    return StyleSheet(productions, _makeSpan(start));
   }
 
-  /** Main entry point for parsing a simple selector sequence. */
+  /// Main entry point for parsing a simple selector sequence.
   StyleSheet parseSelector() {
     List<TreeNode> productions = [];
 
@@ -248,15 +240,17 @@ class _Parser {
       var selector = processSelector();
       if (selector != null) {
         productions.add(selector);
+      } else {
+        break; // Prevent infinite loop if we can't parse something.
       }
     }
 
     checkEndOfFile();
 
-    return new StyleSheet.selector(productions, _makeSpan(start));
+    return StyleSheet.selector(productions, _makeSpan(start));
   }
 
-  /** Generate an error if [file] has not been completely consumed. */
+  /// Generate an error if [file] has not been completely consumed.
   void checkEndOfFile() {
     if (!(_peekKind(TokenKind.END_OF_FILE) ||
         _peekKind(TokenKind.INCOMPLETE_COMMENT))) {
@@ -264,7 +258,7 @@ class _Parser {
     }
   }
 
-  /** Guard to break out of parser when an unexpected end of file is found. */
+  /// Guard to break out of parser when an unexpected end of file is found.
   // TODO(jimhug): Failure to call this method can lead to inifinite parser
   //   loops.  Consider embracing exceptions for more errors to reduce
   //   the danger here.
@@ -284,7 +278,7 @@ class _Parser {
     return _peekToken.kind;
   }
 
-  Token _next({unicodeRange: false}) {
+  Token _next({bool unicodeRange = false}) {
     _previousToken = _peekToken;
     _peekToken = tokenizer.next(unicodeRange: unicodeRange);
     return _previousToken;
@@ -294,23 +288,22 @@ class _Parser {
     return _peekToken.kind == kind;
   }
 
-  /* Is the next token a legal identifier?  This includes pseudo-keywords. */
+  // Is the next token a legal identifier?  This includes pseudo-keywords.
   bool _peekIdentifier() {
     return TokenKind.isIdentifier(_peekToken.kind);
   }
 
-  /** Marks the parser/tokenizer look ahead to support Less nested selectors. */
-  ParserState get _mark =>
-      new ParserState(_peekToken, _previousToken, tokenizer);
+  /// Marks the parser/tokenizer look ahead to support Less nested selectors.
+  ParserState get _mark => ParserState(_peekToken, _previousToken, tokenizer);
 
-  /** Restores the parser/tokenizer state to state remembered by _mark. */
+  /// Restores the parser/tokenizer state to state remembered by _mark.
   void _restore(ParserState markedData) {
     tokenizer.restore(markedData);
     _peekToken = markedData.peekToken;
     _previousToken = markedData.previousToken;
   }
 
-  bool _maybeEat(int kind, {unicodeRange: false}) {
+  bool _maybeEat(int kind, {bool unicodeRange = false}) {
     if (_peekToken.kind == kind) {
       _previousToken = _peekToken;
       _peekToken = tokenizer.next(unicodeRange: unicodeRange);
@@ -320,7 +313,7 @@ class _Parser {
     }
   }
 
-  void _eat(int kind, {unicodeRange: false}) {
+  void _eat(int kind, {bool unicodeRange = false}) {
     if (!_maybeEat(kind, unicodeRange: unicodeRange)) {
       _errorExpected(TokenKind.kindToString(kind));
     }
@@ -328,7 +321,7 @@ class _Parser {
 
   void _errorExpected(String expected) {
     var tok = _next();
-    var message;
+    String message;
     try {
       message = 'expected $expected, but found $tok';
     } catch (e) {
@@ -365,22 +358,20 @@ class _Parser {
   // Top level productions
   ///////////////////////////////////////////////////////////////////
 
-  /**
-   * The media_query_list production below replaces the media_list production
-   * from CSS2 the new grammar is:
-   *
-   *   media_query_list
-   *    : S* [media_query [ ',' S* media_query ]* ]?
-   *   media_query
-   *    : [ONLY | NOT]? S* media_type S* [ AND S* expression ]*
-   *    | expression [ AND S* expression ]*
-   *   media_type
-   *    : IDENT
-   *   expression
-   *    : '(' S* media_feature S* [ ':' S* expr ]? ')' S*
-   *   media_feature
-   *    : IDENT
-   */
+  /// The media_query_list production below replaces the media_list production
+  /// from CSS2 the new grammar is:
+  ///
+  ///     media_query_list
+  ///      : S* [media_query [ ',' S* media_query ]* ]?
+  ///     media_query
+  ///      : [ONLY | NOT]? S* media_type S* [ AND S* expression ]*
+  ///      | expression [ AND S* expression ]*
+  ///     media_type
+  ///      : IDENT
+  ///     expression
+  ///      : '(' S* media_feature S* [ ':' S* expr ]? ')' S*
+  ///     media_feature
+  ///      : IDENT
   List<MediaQuery> processMediaQueryList() {
     var mediaQueries = <MediaQuery>[];
 
@@ -418,7 +409,7 @@ class _Parser {
       start = _peekToken.span;
     }
 
-    var type;
+    Identifier type;
     // Get the media type.
     if (_peekIdentifier()) type = identifier();
 
@@ -443,8 +434,8 @@ class _Parser {
       exprs.add(expr);
     }
 
-    if (unaryOp != -1 || type != null || exprs.length > 0) {
-      return new MediaQuery(unaryOp, type, exprs, _makeSpan(start));
+    if (unaryOp != -1 || type != null || exprs.isNotEmpty) {
+      return MediaQuery(unaryOp, type, exprs, _makeSpan(start));
     }
     return null;
   }
@@ -458,10 +449,9 @@ class _Parser {
         var feature = identifier(); // Media feature.
         var exprs = _maybeEat(TokenKind.COLON)
             ? processExpr()
-            : new Expressions(_makeSpan(_peekToken.span));
+            : Expressions(_makeSpan(_peekToken.span));
         if (_maybeEat(TokenKind.RPAREN)) {
-          return new MediaExpression(
-              andOperator, feature, exprs, _makeSpan(start));
+          return MediaExpression(andOperator, feature, exprs, _makeSpan(start));
         } else if (isChecked) {
           _warning(
               "Missing parenthesis around media expression", _makeSpan(start));
@@ -474,29 +464,27 @@ class _Parser {
     return null;
   }
 
-  /**
-   * Directive grammar:
-   *
-   *  import:             '@import' [string | URI] media_list?
-   *  media:              '@media' media_query_list '{' ruleset '}'
-   *  page:               '@page' [':' IDENT]? '{' declarations '}'
-   *  stylet:             '@stylet' IDENT '{' ruleset '}'
-   *  media_query_list:   IDENT [',' IDENT]
-   *  keyframes:          '@-webkit-keyframes ...' (see grammar below).
-   *  font_face:          '@font-face' '{' declarations '}'
-   *  namespace:          '@namespace name url("xmlns")
-   *  host:               '@host '{' ruleset '}'
-   *  mixin:              '@mixin name [(args,...)] '{' declarations/ruleset '}'
-   *  include:            '@include name [(@arg,@arg1)]
-   *                      '@include name [(@arg...)]
-   *  content:            '@content'
-   *  -moz-document:      '@-moz-document' [ <url> | url-prefix(<string>) |
-   *                          domain(<string>) | regexp(<string) ]# '{'
-   *                        declarations
-   *                      '}'
-   *  supports:           '@supports' supports_condition group_rule_body
-   */
-  processDirective() {
+  /// Directive grammar:
+  ///
+  ///     import:             '@import' [string | URI] media_list?
+  ///     media:              '@media' media_query_list '{' ruleset '}'
+  ///     page:               '@page' [':' IDENT]? '{' declarations '}'
+  ///     stylet:             '@stylet' IDENT '{' ruleset '}'
+  ///     media_query_list:   IDENT [',' IDENT]
+  ///     keyframes:          '@-webkit-keyframes ...' (see grammar below).
+  ///     font_face:          '@font-face' '{' declarations '}'
+  ///     namespace:          '@namespace name url("xmlns")
+  ///     host:               '@host '{' ruleset '}'
+  ///     mixin:              '@mixin name [(args,...)] '{' declarations/ruleset '}'
+  ///     include:            '@include name [(@arg,@arg1)]
+  ///                         '@include name [(@arg...)]
+  ///     content:            '@content'
+  ///     -moz-document:      '@-moz-document' [ <url> | url-prefix(<string>) |
+  ///                             domain(<string>) | regexp(<string) ]# '{'
+  ///                           declarations
+  ///                         '}'
+  ///     supports:           '@supports' supports_condition group_rule_body
+  Directive processDirective() {
     var start = _peekToken.span;
 
     var tokId = processVariableOrDirective();
@@ -524,7 +512,7 @@ class _Parser {
           _error('missing import string', _peekToken.span);
         }
 
-        return new ImportDirective(importStr.trim(), medias, _makeSpan(start));
+        return ImportDirective(importStr.trim(), medias, _makeSpan(start));
 
       case TokenKind.DIRECTIVE_MEDIA:
         _next();
@@ -546,7 +534,7 @@ class _Parser {
         } else {
           _error('expected { after media before ruleset', _peekToken.span);
         }
-        return new MediaDirective(media, rules, _makeSpan(start));
+        return MediaDirective(media, rules, _makeSpan(start));
 
       case TokenKind.DIRECTIVE_HOST:
         _next();
@@ -565,25 +553,23 @@ class _Parser {
         } else {
           _error('expected { after host before ruleset', _peekToken.span);
         }
-        return new HostDirective(rules, _makeSpan(start));
+        return HostDirective(rules, _makeSpan(start));
 
       case TokenKind.DIRECTIVE_PAGE:
-        /*
-         * @page S* IDENT? pseudo_page?
-         *      S* '{' S*
-         *      [ declaration | margin ]?
-         *      [ ';' S* [ declaration | margin ]? ]* '}' S*
-         *
-         * pseudo_page :
-         *      ':' [ "left" | "right" | "first" ]
-         *
-         * margin :
-         *      margin_sym S* '{' declaration [ ';' S* declaration? ]* '}' S*
-         *
-         * margin_sym : @top-left-corner, @top-left, @bottom-left, etc.
-         *
-         * See http://www.w3.org/TR/css3-page/#CSS21
-         */
+        // @page S* IDENT? pseudo_page?
+        //      S* '{' S*
+        //      [ declaration | margin ]?
+        //      [ ';' S* [ declaration | margin ]? ]* '}' S*
+        //
+        // pseudo_page :
+        //      ':' [ "left" | "right" | "first" ]
+        //
+        // margin :
+        //      margin_sym S* '{' declaration [ ';' S* declaration? ]* '}' S*
+        //
+        // margin_sym : @top-left-corner, @top-left, @bottom-left, etc.
+        //
+        // See http://www.w3.org/TR/css3-page/#CSS21
         _next();
 
         // Page name
@@ -593,7 +579,7 @@ class _Parser {
         }
 
         // Any pseudo page?
-        var pseudoPage;
+        Identifier pseudoPage;
         if (_maybeEat(TokenKind.COLON)) {
           if (_peekIdentifier()) {
             pseudoPage = identifier();
@@ -611,7 +597,7 @@ class _Parser {
 
         String pseudoName = pseudoPage is Identifier ? pseudoPage.name : '';
         String ident = name is Identifier ? name.name : '';
-        return new PageDirective(
+        return PageDirective(
             ident, pseudoName, processMarginsDeclarations(), _makeSpan(start));
 
       case TokenKind.DIRECTIVE_CHARSET:
@@ -624,7 +610,7 @@ class _Parser {
           _warning('missing character encoding string', _makeSpan(start));
         }
 
-        return new CharsetDirective(charEncoding, _makeSpan(start));
+        return CharsetDirective(charEncoding, _makeSpan(start));
 
       // TODO(terry): Workaround Dart2js bug continue not implemented in switch
       //              see https://code.google.com/p/dart/issues/detail?id=8270
@@ -653,31 +639,30 @@ class _Parser {
         }
         // TODO(terry): End of workaround.
 
-        /*  Key frames grammar:
-         *
-         *  @[browser]? keyframes [IDENT|STRING] '{' keyframes-blocks '}';
-         *
-         *  browser: [-webkit-, -moz-, -ms-, -o-]
-         *
-         *  keyframes-blocks:
-         *    [keyframe-selectors '{' declarations '}']* ;
-         *
-         *  keyframe-selectors:
-         *    ['from'|'to'|PERCENTAGE] [',' ['from'|'to'|PERCENTAGE] ]* ;
-         */
+        // Key frames grammar:
+        //
+        //     @[browser]? keyframes [IDENT|STRING] '{' keyframes-blocks '}';
+        //
+        //     browser: [-webkit-, -moz-, -ms-, -o-]
+        //
+        //     keyframes-blocks:
+        //       [keyframe-selectors '{' declarations '}']* ;
+        //
+        //     keyframe-selectors:
+        //       ['from'|'to'|PERCENTAGE] [',' ['from'|'to'|PERCENTAGE] ]* ;
         _next();
 
-        var name;
+        Identifier name;
         if (_peekIdentifier()) {
           name = identifier();
         }
 
         _eat(TokenKind.LBRACE);
 
-        var keyframe = new KeyFrameDirective(tokId, name, _makeSpan(start));
+        var keyframe = KeyFrameDirective(tokId, name, _makeSpan(start));
 
         do {
-          Expressions selectors = new Expressions(_makeSpan(start));
+          Expressions selectors = Expressions(_makeSpan(start));
 
           do {
             var term = processTerm();
@@ -687,7 +672,7 @@ class _Parser {
             selectors.add(term);
           } while (_maybeEat(TokenKind.COMMA));
 
-          keyframe.add(new KeyFrameBlock(
+          keyframe.add(KeyFrameBlock(
               selectors, processDeclarations(), _makeSpan(start)));
         } while (!_maybeEat(TokenKind.RBRACE) && !isPrematureEndOfFile());
 
@@ -695,15 +680,14 @@ class _Parser {
 
       case TokenKind.DIRECTIVE_FONTFACE:
         _next();
-        return new FontFaceDirective(processDeclarations(), _makeSpan(start));
+        return FontFaceDirective(processDeclarations(), _makeSpan(start));
 
       case TokenKind.DIRECTIVE_STYLET:
-        /* Stylet grammar:
-         *
-         *  @stylet IDENT '{'
-         *    ruleset
-         *  '}'
-         */
+        // Stylet grammar:
+        //
+        //     @stylet IDENT '{'
+        //       ruleset
+        //     '}'
         _next();
 
         var name;
@@ -726,18 +710,16 @@ class _Parser {
 
         _eat(TokenKind.RBRACE);
 
-        return new StyletDirective(name, productions, _makeSpan(start));
+        return StyletDirective(name, productions, _makeSpan(start));
 
       case TokenKind.DIRECTIVE_NAMESPACE:
-        /* Namespace grammar:
-         *
-         * @namespace S* [namespace_prefix S*]? [STRING|URI] S* ';' S*
-         * namespace_prefix : IDENT
-         *
-         */
+        // Namespace grammar:
+        //
+        // @namespace S* [namespace_prefix S*]? [STRING|URI] S* ';' S*
+        // namespace_prefix : IDENT
         _next();
 
-        var prefix;
+        Identifier prefix;
         if (_peekIdentifier()) {
           prefix = identifier();
         }
@@ -763,7 +745,7 @@ class _Parser {
           }
         }
 
-        return new NamespaceDirective(
+        return NamespaceDirective(
             prefix != null ? prefix.name : '', namespaceUri, _makeSpan(start));
 
       case TokenKind.DIRECTIVE_MIXIN:
@@ -786,16 +768,14 @@ class _Parser {
     return null;
   }
 
-  /**
-   * Parse the mixin beginning token offset [start]. Returns a [MixinDefinition]
-   * node.
-   *
-   * Mixin grammar:
-   *
-   *  @mixin IDENT [(args,...)] '{'
-   *    [ruleset | property | directive]*
-   *  '}'
-   */
+  /// Parse the mixin beginning token offset [start]. Returns a
+  /// [MixinDefinition] node.
+  ///
+  /// Mixin grammar:
+  ///
+  ///     @mixin IDENT [(args,...)] '{'
+  ///       [ruleset | property | directive]*
+  ///     '}'
   MixinDefinition processMixin() {
     _next();
 
@@ -824,8 +804,8 @@ class _Parser {
 
     _eat(TokenKind.LBRACE);
 
-    List<TreeNode> productions = [];
-    var mixinDirective;
+    var productions = <TreeNode>[];
+    MixinDefinition mixinDirective;
 
     var start = _peekToken.span;
     while (!_maybeEat(TokenKind.END_OF_FILE)) {
@@ -844,7 +824,7 @@ class _Parser {
           // If declGroup has items that are declarations then we assume
           // this mixin is a declaration mixin not a top-level mixin.
           if (include is IncludeDirective) {
-            newDecls.add(new IncludeMixinAtDeclaration(include, include.span));
+            newDecls.add(IncludeMixinAtDeclaration(include, include.span));
           } else {
             _warning("Error mixing of top-level vs declarations mixins",
                 _makeSpan(include.span));
@@ -866,7 +846,7 @@ class _Parser {
 
       if (declGroup.declarations.isNotEmpty) {
         if (productions.isEmpty) {
-          mixinDirective = new MixinDeclarationDirective(
+          mixinDirective = MixinDeclarationDirective(
               name.name, params, false, declGroup, _makeSpan(start));
           break;
         } else {
@@ -876,14 +856,14 @@ class _Parser {
           }
         }
       } else {
-        mixinDirective = new MixinRulesetDirective(
+        mixinDirective = MixinRulesetDirective(
             name.name, params, false, productions, _makeSpan(start));
         break;
       }
     }
 
     if (productions.isNotEmpty) {
-      mixinDirective = new MixinRulesetDirective(
+      mixinDirective = MixinRulesetDirective(
           name.name, params, false, productions, _makeSpan(start));
     }
 
@@ -892,11 +872,10 @@ class _Parser {
     return mixinDirective;
   }
 
-  /**
-   * Returns a VarDefinitionDirective or VarDefinition if a varaible otherwise
-   * return the token id of a directive or -1 if neither.
-   */
-  processVariableOrDirective({bool mixinParameter: false}) {
+  /// Returns a VarDefinitionDirective or VarDefinition if a varaible otherwise
+  /// return the token id of a directive or -1 if neither.
+  dynamic // VarDefinitionDirective | VarDefinition | int
+      processVariableOrDirective({bool mixinParameter = false}) {
     var start = _peekToken.span;
 
     var tokId = _peek();
@@ -921,7 +900,7 @@ class _Parser {
           // Less compatibility:
           //    @name: value;      =>    var-name: value;       (VarDefinition)
           //    property: @name;   =>    property: var(name);   (VarUsage)
-          var name;
+          Identifier name;
           if (_peekIdentifier()) {
             name = identifier();
           }
@@ -935,8 +914,7 @@ class _Parser {
           }
 
           var span = _makeSpan(start);
-          return new VarDefinitionDirective(
-              new VarDefinition(name, exprs, span), span);
+          return VarDefinitionDirective(VarDefinition(name, exprs, span), span);
         } else if (isChecked) {
           _error('unexpected directive @$_peekToken', _peekToken.span);
         }
@@ -951,17 +929,16 @@ class _Parser {
         exprs = processExpr();
       }
 
-      return new VarDefinition(definedName, exprs, _makeSpan(start));
+      return VarDefinition(definedName, exprs, _makeSpan(start));
     }
 
     return tokId;
   }
 
-  IncludeDirective processInclude(SourceSpan span, {bool eatSemiColon: true}) {
-    /* Stylet grammar:
-    *
-     *  @include IDENT [(args,...)];
-     */
+  IncludeDirective processInclude(SourceSpan span, {bool eatSemiColon = true}) {
+    // Stylet grammar:
+    //
+    //     @include IDENT [(args,...)];
     _next();
 
     var name;
@@ -999,7 +976,7 @@ class _Parser {
       _eat(TokenKind.SEMICOLON);
     }
 
-    return new IncludeDirective(name.name, params, span);
+    return IncludeDirective(name.name, params, span);
   }
 
   DocumentDirective processDocumentDirective() {
@@ -1029,9 +1006,9 @@ class _Parser {
 
         _eat(TokenKind.RPAREN);
 
-        var arguments = new Expressions(_makeSpan(argumentSpan))
-          ..add(new LiteralTerm(argument, argument, argumentSpan));
-        function = new FunctionTerm(
+        var arguments = Expressions(_makeSpan(argumentSpan))
+          ..add(LiteralTerm(argument, argument, argumentSpan));
+        function = FunctionTerm(
             ident.name, ident.name, arguments, _makeSpan(ident.span));
       } else {
         function = processFunction(ident);
@@ -1043,7 +1020,7 @@ class _Parser {
     _eat(TokenKind.LBRACE);
     var groupRuleBody = processGroupRuleBody();
     _eat(TokenKind.RBRACE);
-    return new DocumentDirective(functions, groupRuleBody, _makeSpan(start));
+    return DocumentDirective(functions, groupRuleBody, _makeSpan(start));
   }
 
   SupportsDirective processSupportsDirective() {
@@ -1053,7 +1030,7 @@ class _Parser {
     _eat(TokenKind.LBRACE);
     var groupRuleBody = processGroupRuleBody();
     _eat(TokenKind.RBRACE);
-    return new SupportsDirective(condition, groupRuleBody, _makeSpan(start));
+    return SupportsDirective(condition, groupRuleBody, _makeSpan(start));
   }
 
   SupportsCondition processSupportsCondition() {
@@ -1068,7 +1045,7 @@ class _Parser {
     while (true) {
       conditions.add(processSupportsConditionInParens());
 
-      var type;
+      ClauseType type;
       var text = _peekToken.text.toLowerCase();
 
       if (text == 'and') {
@@ -1091,9 +1068,9 @@ class _Parser {
     }
 
     if (clauseType == ClauseType.conjunction) {
-      return new SupportsConjunction(conditions, _makeSpan(start));
+      return SupportsConjunction(conditions, _makeSpan(start));
     } else if (clauseType == ClauseType.disjunction) {
-      return new SupportsDisjunction(conditions, _makeSpan(start));
+      return SupportsDisjunction(conditions, _makeSpan(start));
     } else {
       return conditions.first;
     }
@@ -1105,7 +1082,7 @@ class _Parser {
     if (text != 'not') return null;
     _next(); // 'not'
     var condition = processSupportsConditionInParens();
-    return new SupportsNegation(condition, _makeSpan(start));
+    return SupportsNegation(condition, _makeSpan(start));
   }
 
   SupportsConditionInParens processSupportsConditionInParens() {
@@ -1115,19 +1092,19 @@ class _Parser {
     var condition = processSupportsCondition();
     if (condition != null) {
       _eat(TokenKind.RPAREN);
-      return new SupportsConditionInParens.nested(condition, _makeSpan(start));
+      return SupportsConditionInParens.nested(condition, _makeSpan(start));
     }
     // Otherwise, parse a declaration.
     var declaration = processDeclaration([]);
     _eat(TokenKind.RPAREN);
-    return new SupportsConditionInParens(declaration, _makeSpan(start));
+    return SupportsConditionInParens(declaration, _makeSpan(start));
   }
 
   ViewportDirective processViewportDirective() {
     var start = _peekToken.span;
     var name = _next().text;
     var declarations = processDeclarations();
-    return new ViewportDirective(name, declarations, _makeSpan(start));
+    return ViewportDirective(name, declarations, _makeSpan(start));
   }
 
   TreeNode processRule([SelectorGroup selectorGroup]) {
@@ -1140,8 +1117,7 @@ class _Parser {
       selectorGroup = processSelectorGroup();
     }
     if (selectorGroup != null) {
-      return new RuleSet(
-          selectorGroup, processDeclarations(), selectorGroup.span);
+      return RuleSet(selectorGroup, processDeclarations(), selectorGroup.span);
     }
     return null;
   }
@@ -1159,29 +1135,28 @@ class _Parser {
     return nodes;
   }
 
-  /**
-   * Look ahead to see if what should be a declaration is really a selector.
-   * If it's a selector than it's a nested selector.  This support's Less'
-   * nested selector syntax (requires a look ahead). E.g.,
-   *
-   *    div {
-   *      width : 20px;
-   *      span {
-   *        color: red;
-   *      }
-   *    }
-   *
-   * Two tag name selectors div and span equivalent to:
-   *
-   *    div {
-   *      width: 20px;
-   *    }
-   *    div span {
-   *      color: red;
-   *    }
-   *
-   * Return [:null:] if no selector or [SelectorGroup] if a selector was parsed.
-   */
+  /// Look ahead to see if what should be a declaration is really a selector.
+  /// If it's a selector than it's a nested selector.  This support's Less'
+  /// nested selector syntax (requires a look ahead). E.g.,
+  ///
+  ///     div {
+  ///       width : 20px;
+  ///       span {
+  ///         color: red;
+  ///       }
+  ///     }
+  ///
+  /// Two tag name selectors div and span equivalent to:
+  ///
+  ///     div {
+  ///       width: 20px;
+  ///     }
+  ///     div span {
+  ///       color: red;
+  ///     }
+  ///
+  /// Return [:null:] if no selector or [SelectorGroup] if a selector was
+  /// parsed.
   SelectorGroup _nestedSelector() {
     Messages oldMessages = messages;
     _createMessages();
@@ -1208,13 +1183,14 @@ class _Parser {
     }
   }
 
-  DeclarationGroup processDeclarations({bool checkBrace: true}) {
+  DeclarationGroup processDeclarations({bool checkBrace = true}) {
     var start = _peekToken.span;
 
     if (checkBrace) _eat(TokenKind.LBRACE);
 
     var decls = <TreeNode>[];
-    var dartStyles = []; // List of latest styles exposed to Dart.
+    var dartStyles =
+        <DartStyleExpression>[]; // List of latest styles exposed to Dart.
 
     do {
       var selectorGroup = _nestedSelector();
@@ -1254,14 +1230,14 @@ class _Parser {
     // declarations.
     for (var decl in decls) {
       if (decl is Declaration) {
-        if (decl.hasDartStyle && dartStyles.indexOf(decl.dartStyle) < 0) {
+        if (decl.hasDartStyle && !dartStyles.contains(decl.dartStyle)) {
           // Dart style not live, ignore these styles in this Declarations.
           decl.dartStyle = null;
         }
       }
     }
 
-    return new DeclarationGroup(decls, _makeSpan(start));
+    return DeclarationGroup(decls, _makeSpan(start));
   }
 
   List<DeclarationGroup> processMarginsDeclarations() {
@@ -1271,8 +1247,9 @@ class _Parser {
 
     _eat(TokenKind.LBRACE);
 
-    List<Declaration> decls = [];
-    List dartStyles = []; // List of latest styles exposed to Dart.
+    var decls = <Declaration>[];
+    var dartStyles =
+        <DartStyleExpression>[]; // List of latest styles exposed to Dart.
 
     do {
       switch (_peek()) {
@@ -1303,7 +1280,7 @@ class _Parser {
 
           var declGroup = processDeclarations();
           if (declGroup != null) {
-            groups.add(new MarginGroup(
+            groups.add(MarginGroup(
                 marginSym, declGroup.declarations, _makeSpan(start)));
           }
           break;
@@ -1337,14 +1314,14 @@ class _Parser {
     // Fixup declaration to only have dartStyle that are live for this set of
     // declarations.
     for (var decl in decls) {
-      if (decl.hasDartStyle && dartStyles.indexOf(decl.dartStyle) < 0) {
+      if (decl.hasDartStyle && !dartStyles.contains(decl.dartStyle)) {
         // Dart style not live, ignore these styles in this Declarations.
         decl.dartStyle = null;
       }
     }
 
-    if (decls.length > 0) {
-      groups.add(new DeclarationGroup(decls, _makeSpan(start)));
+    if (decls.isNotEmpty) {
+      groups.add(DeclarationGroup(decls, _makeSpan(start)));
     }
 
     return groups;
@@ -1361,15 +1338,13 @@ class _Parser {
       }
     } while (_maybeEat(TokenKind.COMMA));
 
-    if (selectors.length > 0) {
-      return new SelectorGroup(selectors, _makeSpan(start));
+    if (selectors.isNotEmpty) {
+      return SelectorGroup(selectors, _makeSpan(start));
     }
     return null;
   }
 
-  /**
-   * Return list of selectors
-   */
+  /// Return list of selectors
   Selector processSelector() {
     var simpleSequences = <SimpleSelectorSequence>[];
     var start = _peekToken.span;
@@ -1385,7 +1360,7 @@ class _Parser {
 
     if (simpleSequences.isEmpty) return null;
 
-    return new Selector(simpleSequences, _makeSpan(start));
+    return Selector(simpleSequences, _makeSpan(start));
   }
 
   /// Same as [processSelector] but reports an error for each combinator.
@@ -1405,7 +1380,7 @@ class _Parser {
     return selector;
   }
 
-  simpleSelectorSequence(bool forceCombinatorNone) {
+  SimpleSelectorSequence simpleSelectorSequence(bool forceCombinatorNone) {
     var start = _peekToken.span;
     var combinatorType = TokenKind.COMBINATOR_NONE;
     var thisOperator = false;
@@ -1416,29 +1391,12 @@ class _Parser {
         combinatorType = TokenKind.COMBINATOR_PLUS;
         break;
       case TokenKind.GREATER:
-        // Parse > or >>>
         _eat(TokenKind.GREATER);
-        if (_maybeEat(TokenKind.GREATER)) {
-          _eat(TokenKind.GREATER);
-          combinatorType = TokenKind.COMBINATOR_SHADOW_PIERCING_DESCENDANT;
-        } else {
-          combinatorType = TokenKind.COMBINATOR_GREATER;
-        }
+        combinatorType = TokenKind.COMBINATOR_GREATER;
         break;
       case TokenKind.TILDE:
         _eat(TokenKind.TILDE);
         combinatorType = TokenKind.COMBINATOR_TILDE;
-        break;
-      case TokenKind.SLASH:
-        // Parse /deep/
-        _eat(TokenKind.SLASH);
-        var ate = _maybeEat(TokenKind.IDENTIFIER);
-        var tok = ate ? _previousToken : _peekToken;
-        if (!(ate && tok.text == 'deep')) {
-          _error('expected deep, but found ${tok.text}', tok.span);
-        }
-        _eat(TokenKind.SLASH);
-        combinatorType = TokenKind.COMBINATOR_DEEP;
         break;
       case TokenKind.AMPERSAND:
         _eat(TokenKind.AMPERSAND);
@@ -1456,7 +1414,7 @@ class _Parser {
 
     var span = _makeSpan(start);
     var simpleSel = thisOperator
-        ? new ElementSelector(new ThisOperator(span), span)
+        ? ElementSelector(ThisOperator(span), span)
         : simpleSelector();
     if (simpleSel == null &&
         (combinatorType == TokenKind.COMBINATOR_PLUS ||
@@ -1468,32 +1426,31 @@ class _Parser {
       //    .foo&:hover     combinator before & is NONE
       //    .foo &          combinator before & is DESCDENDANT
       //    .foo > &        combinator before & is GREATER
-      simpleSel = new ElementSelector(new Identifier("", span), span);
+      simpleSel = ElementSelector(Identifier("", span), span);
     }
     if (simpleSel != null) {
-      return new SimpleSelectorSequence(simpleSel, span, combinatorType);
+      return SimpleSelectorSequence(simpleSel, span, combinatorType);
     }
+    return null;
   }
 
-  /**
-   * Simple selector grammar:
-   *
-   *    simple_selector_sequence
-   *       : [ type_selector | universal ]
-   *         [ HASH | class | attrib | pseudo | negation ]*
-   *       | [ HASH | class | attrib | pseudo | negation ]+
-   *    type_selector
-   *       : [ namespace_prefix ]? element_name
-   *    namespace_prefix
-   *       : [ IDENT | '*' ]? '|'
-   *    element_name
-   *       : IDENT
-   *    universal
-   *       : [ namespace_prefix ]? '*'
-   *    class
-   *       : '.' IDENT
-   */
-  simpleSelector() {
+  /// Simple selector grammar:
+  ///
+  ///     simple_selector_sequence
+  ///        : [ type_selector | universal ]
+  ///          [ HASH | class | attrib | pseudo | negation ]*
+  ///        | [ HASH | class | attrib | pseudo | negation ]+
+  ///     type_selector
+  ///        : [ namespace_prefix ]? element_name
+  ///     namespace_prefix
+  ///        : [ IDENT | '*' ]? '|'
+  ///     element_name
+  ///        : IDENT
+  ///     universal
+  ///        : [ namespace_prefix ]? '*'
+  ///     class
+  ///        : '.' IDENT
+  SimpleSelector simpleSelector() {
     // TODO(terry): Natalie makes a good point parsing of namespace and element
     //              are essentially the same (asterisk or identifier) other
     //              than the error message for element.  Should consolidate the
@@ -1505,7 +1462,7 @@ class _Parser {
       case TokenKind.ASTERISK:
         // Mark as universal namespace.
         var tok = _next();
-        first = new Wildcard(_makeSpan(tok.span));
+        first = Wildcard(_makeSpan(tok.span));
         break;
       case TokenKind.IDENTIFIER:
         first = identifier();
@@ -1523,12 +1480,12 @@ class _Parser {
     }
 
     if (_maybeEat(TokenKind.NAMESPACE)) {
-      var element;
+      TreeNode element;
       switch (_peek()) {
         case TokenKind.ASTERISK:
           // Mark as universal element
           var tok = _next();
-          element = new Wildcard(_makeSpan(tok.span));
+          element = Wildcard(_makeSpan(tok.span));
           break;
         case TokenKind.IDENTIFIER:
           element = identifier();
@@ -1539,10 +1496,10 @@ class _Parser {
           break;
       }
 
-      return new NamespaceSelector(
-          first, new ElementSelector(element, element.span), _makeSpan(start));
+      return NamespaceSelector(
+          first, ElementSelector(element, element.span), _makeSpan(start));
     } else if (first != null) {
-      return new ElementSelector(first, _makeSpan(start));
+      return ElementSelector(first, _makeSpan(start));
     } else {
       // Check for HASH | class | attrib | pseudo | negation
       return simpleSelectorTail();
@@ -1561,10 +1518,8 @@ class _Parser {
     return false;
   }
 
-  /**
-   * type_selector | universal | HASH | class | attrib | pseudo
-   */
-  simpleSelectorTail() {
+  /// type_selector | universal | HASH | class | attrib | pseudo
+  SimpleSelector simpleSelectorTail() {
     // Check for HASH | class | attrib | pseudo | negation
     var start = _peekToken.span;
     switch (_peek()) {
@@ -1582,7 +1537,7 @@ class _Parser {
             // Generate bad selector id (normalized).
             id.name = " ${id.name}";
           }
-          return new IdSelector(id, _makeSpan(start));
+          return IdSelector(id, _makeSpan(start));
         }
         return null;
       case TokenKind.DOT:
@@ -1599,7 +1554,7 @@ class _Parser {
           // Generate bad selector class (normalized).
           id.name = " ${id.name}";
         }
-        return new ClassSelector(id, _makeSpan(start));
+        return ClassSelector(id, _makeSpan(start));
       case TokenKind.COLON:
         // :pseudo-class ::pseudo-element
         return processPseudoSelector(start);
@@ -1611,9 +1566,10 @@ class _Parser {
         _next();
         break;
     }
+    return null;
   }
 
-  processPseudoSelector(FileSpan start) {
+  SimpleSelector processPseudoSelector(FileSpan start) {
     // :pseudo-class ::pseudo-element
     // TODO(terry): '::' should be token.
     _eat(TokenKind.COLON);
@@ -1622,7 +1578,7 @@ class _Parser {
     // TODO(terry): If no identifier specified consider optimizing out the
     //              : or :: and making this a normal selector.  For now,
     //              create an empty pseudoName.
-    var pseudoName;
+    Identifier pseudoName;
     if (_peekIdentifier()) {
       pseudoName = identifier();
     } else {
@@ -1644,7 +1600,7 @@ class _Parser {
         var negArg = simpleSelector();
 
         _eat(TokenKind.RPAREN);
-        return new NegationSelector(negArg, _makeSpan(start));
+        return NegationSelector(negArg, _makeSpan(start));
       } else if (!pseudoElement && _compoundSelectors.contains(name)) {
         _eat(TokenKind.LPAREN);
         var selector = processCompoundSelector();
@@ -1654,7 +1610,7 @@ class _Parser {
         }
         _eat(TokenKind.RPAREN);
         var span = _makeSpan(start);
-        return new PseudoClassFunctionSelector(pseudoName, selector, span);
+        return PseudoClassFunctionSelector(pseudoName, selector, span);
       } else {
         // Special parsing for expressions in pseudo functions.  Minus is used
         // as operator not identifier.
@@ -1672,37 +1628,35 @@ class _Parser {
 
         // Used during selector look-a-head if not a SelectorExpression is
         // bad.
-        if (expr is! SelectorExpression) {
+        if (expr is SelectorExpression) {
+          _eat(TokenKind.RPAREN);
+          return (pseudoElement)
+              ? PseudoElementFunctionSelector(pseudoName, expr, span)
+              : PseudoClassFunctionSelector(pseudoName, expr, span);
+        } else {
           _errorExpected("CSS expression");
           return null;
         }
-
-        _eat(TokenKind.RPAREN);
-        return (pseudoElement)
-            ? new PseudoElementFunctionSelector(pseudoName, expr, span)
-            : new PseudoClassFunctionSelector(pseudoName, expr, span);
       }
     }
 
     // Treat CSS2.1 pseudo-elements defined with pseudo class syntax as pseudo-
     // elements for backwards compatibility.
     return pseudoElement || _legacyPseudoElements.contains(name)
-        ? new PseudoElementSelector(pseudoName, _makeSpan(start),
+        ? PseudoElementSelector(pseudoName, _makeSpan(start),
             isLegacy: !pseudoElement)
-        : new PseudoClassSelector(pseudoName, _makeSpan(start));
+        : PseudoClassSelector(pseudoName, _makeSpan(start));
   }
 
-  /**
-   *  In CSS3, the expressions are identifiers, strings, or of the form "an+b".
-   *
-   *    : [ [ PLUS | '-' | DIMENSION | NUMBER | STRING | IDENT ] S* ]+
-   *
-   *    num               [0-9]+|[0-9]*\.[0-9]+
-   *    PLUS              '+'
-   *    DIMENSION         {num}{ident}
-   *    NUMBER            {num}
-   */
-  processSelectorExpression() {
+  /// In CSS3, the expressions are identifiers, strings, or of the form "an+b".
+  ///
+  ///     : [ [ PLUS | '-' | DIMENSION | NUMBER | STRING | IDENT ] S* ]+
+  ///
+  ///     num               [0-9]+|[0-9]*\.[0-9]+
+  ///     PLUS              '+'
+  ///     DIMENSION         {num}{ident}
+  ///     NUMBER            {num}
+  TreeNode /* SelectorExpression | LiteralTerm */ processSelectorExpression() {
     var start = _peekToken.span;
 
     var expressions = <Expression>[];
@@ -1716,12 +1670,12 @@ class _Parser {
         case TokenKind.PLUS:
           start = _peekToken.span;
           termToken = _next();
-          expressions.add(new OperatorPlus(_makeSpan(start)));
+          expressions.add(OperatorPlus(_makeSpan(start)));
           break;
         case TokenKind.MINUS:
           start = _peekToken.span;
           termToken = _next();
-          expressions.add(new OperatorMinus(_makeSpan(start)));
+          expressions.add(OperatorMinus(_makeSpan(start)));
           break;
         case TokenKind.INTEGER:
           termToken = _next();
@@ -1734,11 +1688,11 @@ class _Parser {
         case TokenKind.SINGLE_QUOTE:
           value = processQuotedString(false);
           value = "'${_escapeString(value, single: true)}'";
-          return new LiteralTerm(value, value, _makeSpan(start));
+          return LiteralTerm(value, value, _makeSpan(start));
         case TokenKind.DOUBLE_QUOTE:
           value = processQuotedString(false);
           value = '"${_escapeString(value)}"';
-          return new LiteralTerm(value, value, _makeSpan(start));
+          return LiteralTerm(value, value, _makeSpan(start));
         case TokenKind.IDENTIFIER:
           value = identifier(); // Snarf up the ident we'll remap, maybe.
           break;
@@ -1747,13 +1701,13 @@ class _Parser {
       }
 
       if (keepParsing && value != null) {
-        var unitTerm;
+        LiteralTerm unitTerm;
         // Don't process the dimension if MINUS or PLUS is next.
         if (_peek() != TokenKind.MINUS && _peek() != TokenKind.PLUS) {
           unitTerm = processDimension(termToken, value, _makeSpan(start));
         }
         if (unitTerm == null) {
-          unitTerm = new LiteralTerm(value, value.name, _makeSpan(start));
+          unitTerm = LiteralTerm(value, value.name, _makeSpan(start));
         }
         expressions.add(unitTerm);
 
@@ -1761,28 +1715,26 @@ class _Parser {
       }
     }
 
-    return new SelectorExpression(expressions, _makeSpan(start));
+    return SelectorExpression(expressions, _makeSpan(start));
   }
 
-  //  Attribute grammar:
+  // Attribute grammar:
   //
-  //  attributes :
-  //    '[' S* IDENT S* [ ATTRIB_MATCHES S* [ IDENT | STRING ] S* ]? ']'
+  //     attributes :
+  //       '[' S* IDENT S* [ ATTRIB_MATCHES S* [ IDENT | STRING ] S* ]? ']'
   //
-  //  ATTRIB_MATCHES :
-  //    [ '=' | INCLUDES | DASHMATCH | PREFIXMATCH | SUFFIXMATCH | SUBSTRMATCH ]
+  //     ATTRIB_MATCHES :
+  //       [ '=' | INCLUDES | DASHMATCH | PREFIXMATCH | SUFFIXMATCH | SUBSTRMATCH ]
   //
-  //  INCLUDES:         '~='
+  //     INCLUDES:         '~='
   //
-  //  DASHMATCH:        '|='
+  //     DASHMATCH:        '|='
   //
-  //  PREFIXMATCH:      '^='
+  //     PREFIXMATCH:      '^='
   //
-  //  SUFFIXMATCH:      '$='
+  //     SUFFIXMATCH:      '$='
   //
-  //  SUBSTRMATCH:      '*='
-  //
-  //
+  //     SUBSTRMATCH:      '*='
   AttributeSelector processAttribute() {
     var start = _peekToken.span;
 
@@ -1820,7 +1772,7 @@ class _Parser {
 
       _eat(TokenKind.RBRACK);
 
-      return new AttributeSelector(attrName, op, value, _makeSpan(start));
+      return AttributeSelector(attrName, op, value, _makeSpan(start));
     }
     return null;
   }
@@ -1837,8 +1789,7 @@ class _Parser {
   //   property: expr prio? \9; - IE8 and below property, /9 before semi-colon
   //   *IDENT                   - IE7 or below
   //   _IDENT                   - IE6 property (automatically a valid ident)
-  //
-  Declaration processDeclaration(List dartStyles) {
+  Declaration processDeclaration(List<DartStyleExpression> dartStyles) {
     Declaration decl;
 
     var start = _peekToken.span;
@@ -1864,24 +1815,23 @@ class _Parser {
       // Handle !important (prio)
       var importantPriority = _maybeEat(TokenKind.IMPORTANT);
 
-      decl = new Declaration(
-          propertyIdent, exprs, dartComposite, _makeSpan(start),
+      decl = Declaration(propertyIdent, exprs, dartComposite, _makeSpan(start),
           important: importantPriority, ie7: ie7);
     } else if (_peekToken.kind == TokenKind.VAR_DEFINITION) {
       _next();
-      var definedName;
+      Identifier definedName;
       if (_peekIdentifier()) definedName = identifier();
 
       _eat(TokenKind.COLON);
 
       Expressions exprs = processExpr();
 
-      decl = new VarDefinition(definedName, exprs, _makeSpan(start));
+      decl = VarDefinition(definedName, exprs, _makeSpan(start));
     } else if (_peekToken.kind == TokenKind.DIRECTIVE_INCLUDE) {
       // @include mixinName in the declaration area.
       var span = _makeSpan(start);
       var include = processInclude(span, eatSemiColon: false);
-      decl = new IncludeMixinAtDeclaration(include, span);
+      decl = IncludeMixinAtDeclaration(include, span);
     } else if (_peekToken.kind == TokenKind.DIRECTIVE_EXTEND) {
       var simpleSequences = <TreeNode>[];
 
@@ -1902,13 +1852,13 @@ class _Parser {
           _warning("not a valid selector", span);
         }
       }
-      decl = new ExtendDeclaration(simpleSequences, span);
+      decl = ExtendDeclaration(simpleSequences, span);
     }
 
     return decl;
   }
 
-  /** List of styles exposed to the Dart UI framework. */
+  /// List of styles exposed to the Dart UI framework.
   static const int _fontPartFont = 0;
   static const int _fontPartVariant = 1;
   static const int _fontPartWeight = 2;
@@ -1939,7 +1889,7 @@ class _Parser {
   static const int _paddingPartRight = 27;
   static const int _paddingPartBottom = 28;
 
-  static const Map<String, int> _stylesToDart = const {
+  static const Map<String, int> _stylesToDart = {
     'font': _fontPartFont,
     'font-family': _fontPartFamily,
     'font-size': _fontPartSize,
@@ -1971,15 +1921,15 @@ class _Parser {
     'padding-bottom': _paddingPartBottom
   };
 
-  static const Map<String, int> _nameToFontWeight = const {
+  static const Map<String, int> _nameToFontWeight = {
     'bold': FontWeight.bold,
     'normal': FontWeight.normal
   };
 
   static int _findStyle(String styleName) => _stylesToDart[styleName];
 
-  DartStyleExpression _styleForDart(
-      Identifier property, Expressions exprs, List dartStyles) {
+  DartStyleExpression _styleForDart(Identifier property, Expressions exprs,
+      List<DartStyleExpression> dartStyles) {
     var styleType = _findStyle(property.name.toLowerCase());
     if (styleType != null) {
       return buildDartStyleNode(styleType, exprs, dartStyles);
@@ -1987,11 +1937,12 @@ class _Parser {
     return null;
   }
 
-  FontExpression _mergeFontStyles(FontExpression fontExpr, List dartStyles) {
+  FontExpression _mergeFontStyles(
+      FontExpression fontExpr, List<DartStyleExpression> dartStyles) {
     // Merge all font styles for this class selector.
     for (var dartStyle in dartStyles) {
       if (dartStyle.isFont) {
-        fontExpr = new FontExpression.merge(dartStyle, fontExpr);
+        fontExpr = FontExpression.merge(dartStyle, fontExpr);
       }
     }
 
@@ -1999,21 +1950,19 @@ class _Parser {
   }
 
   DartStyleExpression buildDartStyleNode(
-      int styleType, Expressions exprs, List dartStyles) {
+      int styleType, Expressions exprs, List<DartStyleExpression> dartStyles) {
     switch (styleType) {
-      /*
-       * Properties in order:
-       *
-       *   font-style font-variant font-weight font-size/line-height font-family
-       *
-       * The font-size and font-family values are required. If other values are
-       * missing; a default, if it exist, will be used.
-       */
+      // Properties in order:
+      //
+      //     font-style font-variant font-weight font-size/line-height font-family
+      //
+      // The font-size and font-family values are required. If other values are
+      // missing; a default, if it exist, will be used.
       case _fontPartFont:
-        var processor = new ExpressionsProcessor(exprs);
+        var processor = ExpressionsProcessor(exprs);
         return _mergeFontStyles(processor.processFont(), dartStyles);
       case _fontPartFamily:
-        var processor = new ExpressionsProcessor(exprs);
+        var processor = ExpressionsProcessor(exprs);
 
         try {
           return _mergeFontStyles(processor.processFontFamily(), dartStyles);
@@ -2022,45 +1971,45 @@ class _Parser {
         }
         break;
       case _fontPartSize:
-        var processor = new ExpressionsProcessor(exprs);
+        var processor = ExpressionsProcessor(exprs);
         return _mergeFontStyles(processor.processFontSize(), dartStyles);
       case _fontPartStyle:
-        /* Possible style values:
-         *   normal [default]
-         *   italic
-         *   oblique
-         *   inherit
-         */
+        // Possible style values:
+        //   normal [default]
+        //   italic
+        //   oblique
+        //   inherit
+
         // TODO(terry): TBD
         break;
       case _fontPartVariant:
-        /* Possible variant values:
-         *   normal  [default]
-         *   small-caps
-         *   inherit
-         */
+        // Possible variant values:
+        //   normal  [default]
+        //   small-caps
+        //   inherit
+
         // TODO(terry): TBD
         break;
       case _fontPartWeight:
-        /* Possible weight values:
-         *   normal [default]
-         *   bold
-         *   bolder
-         *   lighter
-         *   100 - 900
-         *   inherit
-         */
+        // Possible weight values:
+        //   normal [default]
+        //   bold
+        //   bolder
+        //   lighter
+        //   100 - 900
+        //   inherit
+
         // TODO(terry): Only 'normal', 'bold', or values of 100-900 supoorted
         //              need to handle bolder, lighter, and inherit.  See
         //              https://github.com/dart-lang/csslib/issues/1
         var expr = exprs.expressions[0];
         if (expr is NumberTerm) {
-          var fontExpr = new FontExpression(expr.span, weight: expr.value);
+          var fontExpr = FontExpression(expr.span, weight: expr.value);
           return _mergeFontStyles(fontExpr, dartStyles);
         } else if (expr is LiteralTerm) {
           int weight = _nameToFontWeight[expr.value.toString()];
           if (weight != null) {
-            var fontExpr = new FontExpression(expr.span, weight: weight);
+            var fontExpr = FontExpression(expr.span, weight: weight);
             return _mergeFontStyles(fontExpr, dartStyles);
           }
         }
@@ -2074,15 +2023,15 @@ class _Parser {
             //              See https://github.com/dart-lang/csslib/issues/2.
             if (unitTerm.unit == TokenKind.UNIT_LENGTH_PX ||
                 unitTerm.unit == TokenKind.UNIT_LENGTH_PT) {
-              var fontExpr = new FontExpression(expr.span,
-                  lineHeight: new LineHeight(expr.value, inPixels: true));
+              var fontExpr = FontExpression(expr.span,
+                  lineHeight: LineHeight(expr.value, inPixels: true));
               return _mergeFontStyles(fontExpr, dartStyles);
             } else if (isChecked) {
               _warning("Unexpected unit for line-height", expr.span);
             }
           } else if (expr is NumberTerm) {
-            var fontExpr = new FontExpression(expr.span,
-                lineHeight: new LineHeight(expr.value, inPixels: false));
+            var fontExpr = FontExpression(expr.span,
+                lineHeight: LineHeight(expr.value, inPixels: false));
             return _mergeFontStyles(fontExpr, dartStyles);
           } else if (isChecked) {
             _warning("Unexpected value for line-height", expr.span);
@@ -2090,26 +2039,25 @@ class _Parser {
         }
         break;
       case _marginPartMargin:
-        return new MarginExpression.boxEdge(exprs.span, processFourNums(exprs));
+        return MarginExpression.boxEdge(exprs.span, processFourNums(exprs));
       case _borderPartBorder:
         for (var expr in exprs.expressions) {
           var v = marginValue(expr);
           if (v != null) {
-            final box = new BoxEdge.uniform(v);
-            return new BorderExpression.boxEdge(exprs.span, box);
+            final box = BoxEdge.uniform(v);
+            return BorderExpression.boxEdge(exprs.span, box);
           }
         }
         break;
       case _borderPartWidth:
         var v = marginValue(exprs.expressions[0]);
         if (v != null) {
-          final box = new BoxEdge.uniform(v);
-          return new BorderExpression.boxEdge(exprs.span, box);
+          final box = BoxEdge.uniform(v);
+          return BorderExpression.boxEdge(exprs.span, box);
         }
         break;
       case _paddingPartPadding:
-        return new PaddingExpression.boxEdge(
-            exprs.span, processFourNums(exprs));
+        return PaddingExpression.boxEdge(exprs.span, processFourNums(exprs));
       case _marginPartLeft:
       case _marginPartTop:
       case _marginPartRight:
@@ -2128,7 +2076,7 @@ class _Parser {
       case _paddingPartTop:
       case _paddingPartRight:
       case _paddingPartBottom:
-        if (exprs.expressions.length > 0) {
+        if (exprs.expressions.isNotEmpty) {
           return processOneNumber(exprs, styleType);
         }
         break;
@@ -2143,52 +2091,50 @@ class _Parser {
     if (value != null) {
       switch (part) {
         case _marginPartLeft:
-          return new MarginExpression(exprs.span, left: value);
+          return MarginExpression(exprs.span, left: value);
         case _marginPartTop:
-          return new MarginExpression(exprs.span, top: value);
+          return MarginExpression(exprs.span, top: value);
         case _marginPartRight:
-          return new MarginExpression(exprs.span, right: value);
+          return MarginExpression(exprs.span, right: value);
         case _marginPartBottom:
-          return new MarginExpression(exprs.span, bottom: value);
+          return MarginExpression(exprs.span, bottom: value);
         case _borderPartLeft:
         case _borderPartLeftWidth:
-          return new BorderExpression(exprs.span, left: value);
+          return BorderExpression(exprs.span, left: value);
         case _borderPartTop:
         case _borderPartTopWidth:
-          return new BorderExpression(exprs.span, top: value);
+          return BorderExpression(exprs.span, top: value);
         case _borderPartRight:
         case _borderPartRightWidth:
-          return new BorderExpression(exprs.span, right: value);
+          return BorderExpression(exprs.span, right: value);
         case _borderPartBottom:
         case _borderPartBottomWidth:
-          return new BorderExpression(exprs.span, bottom: value);
+          return BorderExpression(exprs.span, bottom: value);
         case _heightPart:
-          return new HeightExpression(exprs.span, value);
+          return HeightExpression(exprs.span, value);
         case _widthPart:
-          return new WidthExpression(exprs.span, value);
+          return WidthExpression(exprs.span, value);
         case _paddingPartLeft:
-          return new PaddingExpression(exprs.span, left: value);
+          return PaddingExpression(exprs.span, left: value);
         case _paddingPartTop:
-          return new PaddingExpression(exprs.span, top: value);
+          return PaddingExpression(exprs.span, top: value);
         case _paddingPartRight:
-          return new PaddingExpression(exprs.span, right: value);
+          return PaddingExpression(exprs.span, right: value);
         case _paddingPartBottom:
-          return new PaddingExpression(exprs.span, bottom: value);
+          return PaddingExpression(exprs.span, bottom: value);
       }
     }
     return null;
   }
 
-  /**
-   * Margins are of the format:
-   *
-   *   top,right,bottom,left      (4 parameters)
-   *   top,right/left, bottom     (3 parameters)
-   *   top/bottom,right/left      (2 parameters)
-   *   top/right/bottom/left      (1 parameter)
-   *
-   * The values of the margins can be a unit or unitless or auto.
-   */
+  /// Margins are of the format:
+  ///
+  /// * top,right,bottom,left      (4 parameters)
+  /// * top,right/left, bottom     (3 parameters)
+  /// * top/bottom,right/left      (2 parameters)
+  /// * top/right/bottom/left      (1 parameter)
+  ///
+  /// The values of the margins can be a unit or unitless or auto.
   BoxEdge processFourNums(Expressions exprs) {
     num top;
     num right;
@@ -2225,14 +2171,17 @@ class _Parser {
         return null;
     }
 
-    return new BoxEdge.clockwiseFromTop(top, right, bottom, left);
+    return BoxEdge.clockwiseFromTop(top, right, bottom, left);
   }
 
   // TODO(terry): Need to handle auto.
-  marginValue(var exprTerm) {
-    if (exprTerm is UnitTerm || exprTerm is NumberTerm) {
-      return exprTerm.value;
+  num marginValue(Expression exprTerm) {
+    if (exprTerm is UnitTerm) {
+      return exprTerm.value as num;
+    } else if (exprTerm is NumberTerm) {
+      return exprTerm.value as num;
     }
+    return null;
   }
 
   //  Expression grammar:
@@ -2241,28 +2190,27 @@ class _Parser {
   //
   //  operator:     '/' | ','
   //  term:         (see processTerm)
-  //
   Expressions processExpr([bool ieFilter = false]) {
     var start = _peekToken.span;
-    var expressions = new Expressions(_makeSpan(start));
+    var expressions = Expressions(_makeSpan(start));
 
     var keepGoing = true;
     var expr;
     while (keepGoing && (expr = processTerm(ieFilter)) != null) {
-      var op;
+      Expression op;
 
       var opStart = _peekToken.span;
 
       switch (_peek()) {
         case TokenKind.SLASH:
-          op = new OperatorSlash(_makeSpan(opStart));
+          op = OperatorSlash(_makeSpan(opStart));
           break;
         case TokenKind.COMMA:
-          op = new OperatorComma(_makeSpan(opStart));
+          op = OperatorComma(_makeSpan(opStart));
           break;
         case TokenKind.BACKSLASH:
-          // Backslash outside of string; detected IE8 or older signaled by \9 at
-          // end of an expression.
+          // Backslash outside of string; detected IE8 or older signaled by \9
+          // at end of an expression.
           var ie8Start = _peekToken.span;
 
           _next();
@@ -2270,7 +2218,7 @@ class _Parser {
             var numToken = _next();
             var value = int.parse(numToken.text);
             if (value == 9) {
-              op = new IE8Term(_makeSpan(ie8Start));
+              op = IE8Term(_makeSpan(ie8Start));
             } else if (isChecked) {
               _warning(
                   "\$value is not valid in an expression", _makeSpan(start));
@@ -2280,10 +2228,10 @@ class _Parser {
       }
 
       if (expr != null) {
-        if (expr is List) {
-          expr.forEach((exprItem) {
+        if (expr is List<Expression>) {
+          for (var exprItem in expr) {
             expressions.add(exprItem);
-          });
+          }
         } else {
           expressions.add(expr);
         }
@@ -2306,28 +2254,29 @@ class _Parser {
 
   static const int MAX_UNICODE = 0x10FFFF;
 
-  //  Term grammar:
+  // Term grammar:
   //
-  //  term:
-  //    unary_operator?
-  //    [ term_value ]
-  //    | STRING S* | IDENT S* | URI S* | UNICODERANGE S* | hexcolor
+  //     term:
+  //       unary_operator?
+  //       [ term_value ]
+  //       | STRING S* | IDENT S* | URI S* | UNICODERANGE S* | hexcolor
   //
-  //  term_value:
-  //    NUMBER S* | PERCENTAGE S* | LENGTH S* | EMS S* | EXS S* | ANGLE S* |
-  //    TIME S* | FREQ S* | function
+  //     term_value:
+  //       NUMBER S* | PERCENTAGE S* | LENGTH S* | EMS S* | EXS S* | ANGLE S* |
+  //       TIME S* | FREQ S* | function
   //
-  //  NUMBER:       {num}
-  //  PERCENTAGE:   {num}%
-  //  LENGTH:       {num}['px' | 'cm' | 'mm' | 'in' | 'pt' | 'pc']
-  //  EMS:          {num}'em'
-  //  EXS:          {num}'ex'
-  //  ANGLE:        {num}['deg' | 'rad' | 'grad']
-  //  TIME:         {num}['ms' | 's']
-  //  FREQ:         {num}['hz' | 'khz']
-  //  function:     IDENT '(' expr ')'
+  //     NUMBER:       {num}
+  //     PERCENTAGE:   {num}%
+  //     LENGTH:       {num}['px' | 'cm' | 'mm' | 'in' | 'pt' | 'pc']
+  //     EMS:          {num}'em'
+  //     EXS:          {num}'ex'
+  //     ANGLE:        {num}['deg' | 'rad' | 'grad']
+  //     TIME:         {num}['ms' | 's']
+  //     FREQ:         {num}['hz' | 'khz']
+  //     function:     IDENT '(' expr ')'
   //
-  processTerm([bool ieFilter = false]) {
+  dynamic /* Expression | List<Expression> | ... */ processTerm(
+      [bool ieFilter = false]) {
     var start = _peekToken.span;
     Token t; // token for term's value
     var value; // value of term (numeric values)
@@ -2371,17 +2320,17 @@ class _Parser {
       case TokenKind.SINGLE_QUOTE:
         value = processQuotedString(false);
         value = "'${_escapeString(value, single: true)}'";
-        return new LiteralTerm(value, value, _makeSpan(start));
+        return LiteralTerm(value, value, _makeSpan(start));
       case TokenKind.DOUBLE_QUOTE:
         value = processQuotedString(false);
         value = '"${_escapeString(value)}"';
-        return new LiteralTerm(value, value, _makeSpan(start));
+        return LiteralTerm(value, value, _makeSpan(start));
       case TokenKind.LPAREN:
         _next();
 
-        GroupTerm group = new GroupTerm(_makeSpan(start));
+        GroupTerm group = GroupTerm(_makeSpan(start));
 
-        var term;
+        dynamic /* Expression | List<Expression> | ... */ term;
         do {
           term = processTerm();
           if (term != null && term is LiteralTerm) {
@@ -2402,7 +2351,7 @@ class _Parser {
 
         _eat(TokenKind.RBRACK);
 
-        return new ItemTerm(term.value, term.text, _makeSpan(start));
+        return ItemTerm(term.value, term.text, _makeSpan(start));
       case TokenKind.IDENTIFIER:
         var nameValue = identifier(); // Snarf up the ident we'll remap, maybe.
 
@@ -2418,8 +2367,8 @@ class _Parser {
             // IE filter:progid:
             return processIEFilter(start);
           } else {
-            // Handle filter:<name> where name is any filter e.g., alpha, chroma,
-            // Wave, blur, etc.
+            // Handle filter:<name> where name is any filter e.g., alpha,
+            // chroma, Wave, blur, etc.
             return processIEFilter(start);
           }
         }
@@ -2427,7 +2376,7 @@ class _Parser {
         // TODO(terry): Need to have a list of known identifiers today only
         //              'from' is special.
         if (nameValue.name == 'from') {
-          return new LiteralTerm(nameValue, nameValue.name, _makeSpan(start));
+          return LiteralTerm(nameValue, nameValue.name, _makeSpan(start));
         }
 
         // What kind of identifier is it, named color?
@@ -2440,7 +2389,7 @@ class _Parser {
                 : "Unknown property value ${propName}";
             _warning(errMsg, _makeSpan(start));
           }
-          return new LiteralTerm(nameValue, nameValue.name, _makeSpan(start));
+          return LiteralTerm(nameValue, nameValue.name, _makeSpan(start));
         }
 
         // Yes, process the color as an RGB value.
@@ -2448,10 +2397,10 @@ class _Parser {
             TokenKind.decimalToHex(TokenKind.colorValue(colorEntry), 6);
         return _parseHex(rgbColor, _makeSpan(start));
       case TokenKind.UNICODE_RANGE:
-        var first;
-        var second;
-        var firstNumber;
-        var secondNumber;
+        String first;
+        String second;
+        int firstNumber;
+        int secondNumber;
         _eat(TokenKind.UNICODE_RANGE, unicodeRange: true);
         if (_maybeEat(TokenKind.HEX_INTEGER, unicodeRange: true)) {
           first = _previousToken.text;
@@ -2477,7 +2426,7 @@ class _Parser {
           first = _previousToken.text;
         }
 
-        return new UnicodeRangeTerm(first, second, _makeSpan(start));
+        return UnicodeRangeTerm(first, second, _makeSpan(start));
       case TokenKind.AT:
         if (messages.options.lessSupport) {
           _next();
@@ -2489,7 +2438,7 @@ class _Parser {
 
           var param = expr.expressions[0];
           var varUsage =
-              new VarUsage((param as LiteralTerm).text, [], _makeSpan(start));
+              VarUsage((param as LiteralTerm).text, [], _makeSpan(start));
           expr.expressions[0] = varUsage;
           return expr.expressions;
         }
@@ -2499,18 +2448,18 @@ class _Parser {
     return t != null ? processDimension(t, value, _makeSpan(start)) : null;
   }
 
-  /** Process all dimension units. */
+  /// Process all dimension units.
   LiteralTerm processDimension(Token t, var value, SourceSpan span) {
     LiteralTerm term;
     var unitType = this._peek();
 
     switch (unitType) {
       case TokenKind.UNIT_EM:
-        term = new EmTerm(value, t.text, span);
+        term = EmTerm(value, t.text, span);
         _next(); // Skip the unit
         break;
       case TokenKind.UNIT_EX:
-        term = new ExTerm(value, t.text, span);
+        term = ExTerm(value, t.text, span);
         _next(); // Skip the unit
         break;
       case TokenKind.UNIT_LENGTH_PX:
@@ -2519,60 +2468,60 @@ class _Parser {
       case TokenKind.UNIT_LENGTH_IN:
       case TokenKind.UNIT_LENGTH_PT:
       case TokenKind.UNIT_LENGTH_PC:
-        term = new LengthTerm(value, t.text, span, unitType);
+        term = LengthTerm(value, t.text, span, unitType);
         _next(); // Skip the unit
         break;
       case TokenKind.UNIT_ANGLE_DEG:
       case TokenKind.UNIT_ANGLE_RAD:
       case TokenKind.UNIT_ANGLE_GRAD:
       case TokenKind.UNIT_ANGLE_TURN:
-        term = new AngleTerm(value, t.text, span, unitType);
+        term = AngleTerm(value, t.text, span, unitType);
         _next(); // Skip the unit
         break;
       case TokenKind.UNIT_TIME_MS:
       case TokenKind.UNIT_TIME_S:
-        term = new TimeTerm(value, t.text, span, unitType);
+        term = TimeTerm(value, t.text, span, unitType);
         _next(); // Skip the unit
         break;
       case TokenKind.UNIT_FREQ_HZ:
       case TokenKind.UNIT_FREQ_KHZ:
-        term = new FreqTerm(value, t.text, span, unitType);
+        term = FreqTerm(value, t.text, span, unitType);
         _next(); // Skip the unit
         break;
       case TokenKind.PERCENT:
-        term = new PercentageTerm(value, t.text, span);
+        term = PercentageTerm(value, t.text, span);
         _next(); // Skip the %
         break;
       case TokenKind.UNIT_FRACTION:
-        term = new FractionTerm(value, t.text, span);
+        term = FractionTerm(value, t.text, span);
         _next(); // Skip the unit
         break;
       case TokenKind.UNIT_RESOLUTION_DPI:
       case TokenKind.UNIT_RESOLUTION_DPCM:
       case TokenKind.UNIT_RESOLUTION_DPPX:
-        term = new ResolutionTerm(value, t.text, span, unitType);
+        term = ResolutionTerm(value, t.text, span, unitType);
         _next(); // Skip the unit
         break;
       case TokenKind.UNIT_CH:
-        term = new ChTerm(value, t.text, span, unitType);
+        term = ChTerm(value, t.text, span, unitType);
         _next(); // Skip the unit
         break;
       case TokenKind.UNIT_REM:
-        term = new RemTerm(value, t.text, span, unitType);
+        term = RemTerm(value, t.text, span, unitType);
         _next(); // Skip the unit
         break;
       case TokenKind.UNIT_VIEWPORT_VW:
       case TokenKind.UNIT_VIEWPORT_VH:
       case TokenKind.UNIT_VIEWPORT_VMIN:
       case TokenKind.UNIT_VIEWPORT_VMAX:
-        term = new ViewportTerm(value, t.text, span, unitType);
+        term = ViewportTerm(value, t.text, span, unitType);
         _next(); // Skip the unit
         break;
       default:
         if (value != null && t != null) {
           term = (value is Identifier)
-              ? new LiteralTerm(value, value.name, span)
-              : new NumberTerm(value, t.text, span);
+              ? LiteralTerm(value, value.name, span)
+              : NumberTerm(value, t.text, span);
         }
         break;
     }
@@ -2616,7 +2565,7 @@ class _Parser {
     }
 
     // Gobble up everything until we hit our stop token.
-    var stringValue = new StringBuffer();
+    var stringValue = StringBuffer();
     while (_peek() != stopToken && _peek() != TokenKind.END_OF_FILE) {
       stringValue.write(_next().text);
     }
@@ -2633,21 +2582,19 @@ class _Parser {
 
   // TODO(terry): Should probably understand IE's non-standard filter syntax to
   //              fully support calc, var(), etc.
-  /**
-   * IE's filter property breaks CSS value parsing.  IE's format can be:
-   *
-   *    filter: progid:DXImageTransform.MS.gradient(Type=0, Color='#9d8b83');
-   *
-   * We'll just parse everything after the 'progid:' look for the left paren
-   * then parse to the right paren ignoring everything in between.
-   */
+  /// IE's filter property breaks CSS value parsing.  IE's format can be:
+  ///
+  ///    filter: progid:DXImageTransform.MS.gradient(Type=0, Color='#9d8b83');
+  ///
+  /// We'll just parse everything after the 'progid:' look for the left paren
+  /// then parse to the right paren ignoring everything in between.
   processIEFilter(FileSpan startAfterProgidColon) {
     // Support non-functional filters (i.e. filter: FlipH)
     var kind = _peek();
     if (kind == TokenKind.SEMICOLON || kind == TokenKind.RBRACE) {
       var tok = tokenizer.makeIEFilter(
           startAfterProgidColon.start.offset, _peekToken.start);
-      return new LiteralTerm(tok.text, tok.text, tok.span);
+      return LiteralTerm(tok.text, tok.text, tok.span);
     }
 
     var parens = 0;
@@ -2662,7 +2609,7 @@ class _Parser {
           if (--parens == 0) {
             var tok = tokenizer.makeIEFilter(
                 startAfterProgidColon.start.offset, _peekToken.start);
-            return new LiteralTerm(tok.text, tok.text, tok.span);
+            return LiteralTerm(tok.text, tok.text, tok.span);
           }
           break;
         default:
@@ -2671,23 +2618,23 @@ class _Parser {
     }
   }
 
-  //  TODO(terry): Hack to gobble up the calc expression as a string looking
-  //               for the matching RPAREN the expression is not parsed into the
-  //               AST.
+  // TODO(terry): Hack to gobble up the calc expression as a string looking
+  //              for the matching RPAREN the expression is not parsed into the
+  //              AST.
   //
-  //  grammar should be:
+  // grammar should be:
   //
-  //    <calc()> = calc( <calc-sum> )
-  //    <calc-sum> = <calc-product> [ [ '+' | '-' ] <calc-product> ]*
-  //    <calc-product> = <calc-value> [ '*' <calc-value> | '/' <number> ]*
-  //    <calc-value> = <number> | <dimension> | <percentage> | ( <calc-sum> )
+  //     <calc()> = calc( <calc-sum> )
+  //     <calc-sum> = <calc-product> [ [ '+' | '-' ] <calc-product> ]*
+  //     <calc-product> = <calc-value> [ '*' <calc-value> | '/' <number> ]*
+  //     <calc-value> = <number> | <dimension> | <percentage> | ( <calc-sum> )
   //
   String processCalcExpression() {
     var inString = tokenizer._inString;
     tokenizer._inString = false;
 
     // Gobble up everything until we hit our stop token.
-    var stringValue = new StringBuffer();
+    var stringValue = StringBuffer();
     var left = 1;
     var matchingParens = false;
     while (_peek() != TokenKind.END_OF_FILE && !matchingParens) {
@@ -2716,13 +2663,13 @@ class _Parser {
     if (name == 'calc' || name == '-webkit-calc' || name == '-moz-calc') {
       // TODO(terry): Implement expression parsing properly.
       String expression = processCalcExpression();
-      var calcExpr = new LiteralTerm(expression, expression, _makeSpan(start));
+      var calcExpr = LiteralTerm(expression, expression, _makeSpan(start));
 
       if (!_maybeEat(TokenKind.RPAREN)) {
         _error("problem parsing function expected ), ", _peekToken.span);
       }
 
-      return new CalcTerm(name, name, calcExpr, _makeSpan(start));
+      return CalcTerm(name, name, calcExpr, _makeSpan(start));
     }
 
     return null;
@@ -2732,13 +2679,14 @@ class _Parser {
   //
   //  function:     IDENT '(' expr ')'
   //
-  processFunction(Identifier func) {
+  TreeNode /* LiteralTerm | Expression */ processFunction(Identifier func) {
     var start = _peekToken.span;
     var name = func.name;
 
     switch (name) {
       case 'url':
-        // URI term sucks up everything inside of quotes(' or ") or between parens
+        // URI term sucks up everything inside of quotes(' or ") or between
+        // parens.
         var urlParam = processQuotedString(true);
 
         // TODO(terry): Better error message and checking for mismatched quotes.
@@ -2750,11 +2698,12 @@ class _Parser {
           _next();
         }
 
-        return new UriTerm(urlParam, _makeSpan(start));
+        return UriTerm(urlParam, _makeSpan(start));
       case 'var':
-        // TODO(terry): Consider handling var in IE specific filter/progid.  This
-        //              will require parsing entire IE specific syntax e.g.,
-        //              param = value or progid:com_id, etc. for example:
+        // TODO(terry): Consider handling var in IE specific filter/progid.
+        //              This will require parsing entire IE specific syntax
+        //              e.g. `param = value` or `progid:com_id`, etc.
+        //              for example:
         //
         //    var-blur: Blur(Add = 0, Direction = 225, Strength = 10);
         //    var-gradient: progid:DXImageTransform.Microsoft.gradient"
@@ -2774,14 +2723,14 @@ class _Parser {
         var defaultValues = expr.expressions.length >= 3
             ? expr.expressions.sublist(2)
             : <Expression>[];
-        return new VarUsage(paramName, defaultValues, _makeSpan(start));
+        return VarUsage(paramName, defaultValues, _makeSpan(start));
       default:
         var expr = processExpr();
         if (!_maybeEat(TokenKind.RPAREN)) {
           _error("problem parsing function expected ), ", _peekToken.span);
         }
 
-        return new FunctionTerm(name, name, expr, _makeSpan(start));
+        return FunctionTerm(name, name, expr, _makeSpan(start));
     }
   }
 
@@ -2793,10 +2742,10 @@ class _Parser {
       if (isChecked) {
         _warning('expected identifier, but found $tok', tok.span);
       }
-      return new Identifier("", _makeSpan(tok.span));
+      return Identifier("", _makeSpan(tok.span));
     }
 
-    return new Identifier(tok.text, _makeSpan(tok.span));
+    return Identifier(tok.text, _makeSpan(tok.span));
   }
 
   // TODO(terry): Move this to base <= 36 and into shared code.
@@ -2819,7 +2768,7 @@ class _Parser {
       var digit = _hexDigit(hexText.codeUnitAt(i));
       if (digit < 0) {
         _warning('Bad hex number', span);
-        return new HexColorTerm(new BAD_HEX_VALUE(), hexText, span);
+        return HexColorTerm(BAD_HEX_VALUE(), hexText, span);
       }
       hexValue = (hexValue << 4) + digit;
     }
@@ -2839,7 +2788,7 @@ class _Parser {
     } else if (hexText.length == 2 && hexText[0] == hexText[1]) {
       hexText = '${hexText[0]}';
     }
-    return new HexColorTerm(hexValue, hexText, span);
+    return HexColorTerm(hexValue, hexText, span);
   }
 }
 
@@ -2851,21 +2800,20 @@ class ExpressionsProcessor {
 
   // TODO(terry): Only handles ##px unit.
   FontExpression processFontSize() {
-    /* font-size[/line-height]
-     *
-     * Possible size values:
-     *   xx-small
-     *   small
-     *   medium [default]
-     *   large
-     *   x-large
-     *   xx-large
-     *   smaller
-     *   larger
-     *   ##length in px, pt, etc.
-     *   ##%, percent of parent elem's font-size
-     *   inherit
-     */
+    // font-size[/line-height]
+    //
+    // Possible size values:
+    // * xx-small
+    // * small
+    // * medium [default]
+    // * large
+    // * x-large
+    // * xx-large
+    // * smaller
+    // * larger
+    // * ##length in px, pt, etc.
+    // * ##%, percent of parent elem's font-size
+    // * inherit
     LengthTerm size;
     LineHeight lineHt;
     var nextIsLineHeight = false;
@@ -2880,7 +2828,7 @@ class ExpressionsProcessor {
           nextIsLineHeight = true;
         } else if (nextIsLineHeight && expr is LengthTerm) {
           assert(expr.unit == TokenKind.UNIT_LENGTH_PX);
-          lineHt = new LineHeight(expr.value, inPixels: true);
+          lineHt = LineHeight(expr.value, inPixels: true);
           nextIsLineHeight = false;
           _index++;
           break;
@@ -2892,36 +2840,35 @@ class ExpressionsProcessor {
       }
     }
 
-    return new FontExpression(_exprs.span, size: size, lineHeight: lineHt);
+    return FontExpression(_exprs.span, size: size, lineHeight: lineHt);
   }
 
   FontExpression processFontFamily() {
     var family = <String>[];
 
-    /* Possible family values:
-     * font-family: arial, Times new roman ,Lucida Sans Unicode,Courier;
-     * font-family: "Times New Roman", arial, Lucida Sans Unicode, Courier;
-     */
+    // Possible family values:
+    // * font-family: arial, Times new roman ,Lucida Sans Unicode,Courier;
+    // * font-family: "Times New Roman", arial, Lucida Sans Unicode, Courier;
     var moreFamilies = false;
 
     for (; _index < _exprs.expressions.length; _index++) {
       Expression expr = _exprs.expressions[_index];
       if (expr is LiteralTerm) {
-        if (family.length == 0 || moreFamilies) {
+        if (family.isEmpty || moreFamilies) {
           // It's font-family now.
           family.add(expr.toString());
           moreFamilies = false;
         } else if (isChecked) {
           messages.warning('Only font-family can be a list', _exprs.span);
         }
-      } else if (expr is OperatorComma && family.length > 0) {
+      } else if (expr is OperatorComma && family.isNotEmpty) {
         moreFamilies = true;
       } else {
         break;
       }
     }
 
-    return new FontExpression(_exprs.span, family: family);
+    return FontExpression(_exprs.span, family: family);
   }
 
   FontExpression processFont() {
@@ -2942,23 +2889,21 @@ class ExpressionsProcessor {
       //               https://github.com/dart-lang/csslib/issues/5
     }
 
-    return new FontExpression(_exprs.span,
+    return FontExpression(_exprs.span,
         size: fontSize.font.size,
         lineHeight: fontSize.font.lineHeight,
         family: fontFamily.font.family);
   }
 }
 
-/**
- * Escapes [text] for use in a CSS string.
- * [single] specifies single quote `'` vs double quote `"`.
- */
-String _escapeString(String text, {bool single: false}) {
-  StringBuffer result = null;
+/// Escapes [text] for use in a CSS string.
+/// [single] specifies single quote `'` vs double quote `"`.
+String _escapeString(String text, {bool single = false}) {
+  StringBuffer result;
 
   for (int i = 0; i < text.length; i++) {
     var code = text.codeUnitAt(i);
-    String replace = null;
+    String replace;
     switch (code) {
       case 34 /*'"'*/ :
         if (!single) replace = r'\"';
@@ -2969,7 +2914,7 @@ String _escapeString(String text, {bool single: false}) {
     }
 
     if (replace != null && result == null) {
-      result = new StringBuffer(text.substring(0, i));
+      result = StringBuffer(text.substring(0, i));
     }
 
     if (result != null) result.write(replace != null ? replace : text[i]);

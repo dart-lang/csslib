@@ -2,12 +2,10 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library csslib.src.validate;
-
 import 'package:csslib/visitor.dart';
 import 'package:source_span/source_span.dart';
 
-/** Can be thrown on any Css runtime problem includes source location. */
+/// Can be thrown on any Css runtime problem includes source location.
 class CssSelectorException extends SourceSpanException {
   CssSelectorException(String message, [SourceSpan span])
       : super(message, span);
@@ -17,12 +15,12 @@ List<String> classes = [];
 List<String> ids = [];
 
 class Validate {
-  static int _classNameCheck(var selector, int matches) {
-    if (selector.isCombinatorDescendant() ||
-        (selector.isCombinatorNone() && matches == 0)) {
+  static int _classNameCheck(SimpleSelectorSequence selector, int matches) {
+    if (selector.isCombinatorDescendant ||
+        (selector.isCombinatorNone && matches == 0)) {
       if (matches < 0) {
         String tooMany = selector.simpleSelector.toString();
-        throw new CssSelectorException(
+        throw CssSelectorException(
             'Can not mix Id selector with class selector(s). Id '
             'selector must be singleton too many starting at $tooMany');
       }
@@ -30,22 +28,22 @@ class Validate {
       return matches + 1;
     } else {
       String error = selector.toString();
-      throw new CssSelectorException(
+      throw CssSelectorException(
           'Selectors can not have combinators (>, +, or ~) before $error');
     }
   }
 
-  static int _elementIdCheck(var selector, int matches) {
-    if (selector.isCombinatorNone() && matches == 0) {
+  static int _elementIdCheck(SimpleSelectorSequence selector, int matches) {
+    if (selector.isCombinatorNone && matches == 0) {
       // Perfect just one element id returns matches of -1.
       return -1;
-    } else if (selector.isCombinatorDescendant()) {
+    } else if (selector.isCombinatorDescendant) {
       String tooMany = selector.simpleSelector.toString();
-      throw new CssSelectorException(
+      throw CssSelectorException(
           'Use of Id selector must be singleton starting at $tooMany');
     } else {
       String error = selector.simpleSelector.toString();
-      throw new CssSelectorException(
+      throw CssSelectorException(
           'Selectors can not have combinators (>, +, or ~) before $error');
     }
   }
@@ -105,13 +103,12 @@ class Validate {
           }
         } else {
           String badSelector = simpleSelector.toString();
-          throw new CssSelectorException(
-              'Invalid template selector $badSelector');
+          throw CssSelectorException('Invalid template selector $badSelector');
         }
 
         if (!found) {
           String unknownName = simpleSelector.toString();
-          throw new CssSelectorException('Unknown selector name $unknownName');
+          throw CssSelectorException('Unknown selector name $unknownName');
         }
       }
     }

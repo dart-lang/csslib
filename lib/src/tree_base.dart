@@ -2,40 +2,38 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of csslib.visitor;
+part of '../visitor.dart';
 
-/**
- * The base type for all nodes in a CSS abstract syntax tree.
- */
+/// The base type for all nodes in a CSS abstract syntax tree.
 abstract class TreeNode {
-  /** The source code this [TreeNode] represents. */
+  /// The source code this [TreeNode] represents.
   final SourceSpan span;
 
   TreeNode(this.span);
 
   TreeNode clone();
 
-  /** Classic double-dispatch visitor for implementing passes. */
+  /// Classic double-dispatch visitor for implementing passes.
   visit(VisitorBase visitor);
 
-  /** A multiline string showing the node and its children. */
+  /// A multiline string showing the node and its children.
   String toDebugString() {
-    var to = new TreeOutput();
-    var tp = new _TreePrinter(to, true);
+    var to = TreeOutput();
+    var tp = _TreePrinter(to, true);
     this.visit(tp);
     return to.buf.toString();
   }
 }
 
-/** The base type for expressions. */
+/// The base type for expressions.
 abstract class Expression extends TreeNode {
   Expression(SourceSpan span) : super(span);
 }
 
-/** Simple class to provide a textual dump of trees for debugging. */
+/// Simple class to provide a textual dump of trees for debugging.
 class TreeOutput {
   int depth = 0;
-  final StringBuffer buf = new StringBuffer();
+  final StringBuffer buf = StringBuffer();
   VisitorBase printer;
 
   void write(String s) {

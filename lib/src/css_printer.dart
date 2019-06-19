@@ -2,31 +2,27 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of csslib.visitor;
+part of '../visitor.dart';
 
-/**
- * Visitor that produces a formatted string representation of the CSS tree.
- */
+/// Visitor that produces a formatted string representation of the CSS tree.
 class CssPrinter extends Visitor {
-  StringBuffer _buff = new StringBuffer();
+  StringBuffer _buff = StringBuffer();
   bool prettyPrint = true;
 
-  /**
-   * Walk the [tree] Stylesheet. [pretty] if true emits line breaks, extra
-   * spaces, friendly property values, etc., if false emits compacted output.
-   */
-  void visitTree(StyleSheet tree, {bool pretty: false}) {
+  /// Walk the [tree] Stylesheet. [pretty] if true emits line breaks, extra
+  /// spaces, friendly property values, etc., if false emits compacted output.
+  void visitTree(StyleSheet tree, {bool pretty = false}) {
     prettyPrint = pretty;
-    _buff = new StringBuffer();
+    _buff = StringBuffer();
     visitStyleSheet(tree);
   }
 
-  /** Appends [str] to the output buffer. */
+  /// Appends [str] to the output buffer.
   void emit(String str) {
     _buff.write(str);
   }
 
-  /** Returns the output buffer. */
+  /// Returns the output buffer.
   String toString() => _buff.toString().trim();
 
   String get _newLine => prettyPrint ? '\n' : '';
@@ -155,11 +151,9 @@ class CssPrinter extends Visitor {
     emit('$_newLine}');
   }
 
-  /**
-   *  @page : pseudoPage {
-   *    decls
-   *  }
-   */
+  ///  @page : pseudoPage {
+  ///    decls
+  ///  }
   void visitPageDirective(PageDirective node) {
     emit('$_newLine@page');
     if (node.hasIdent || node.hasPseudoPage) {
@@ -177,13 +171,13 @@ class CssPrinter extends Visitor {
     emit('}');
   }
 
-  /** @charset "charset encoding" */
+  /// @charset "charset encoding"
   void visitCharsetDirective(CharsetDirective node) {
     emit('$_newLine@charset "${node.charEncoding}";');
   }
 
   void visitImportDirective(ImportDirective node) {
-    bool isStartingQuote(String ch) => ('\'"'.indexOf(ch[0]) >= 0);
+    bool isStartingQuote(String ch) => ('\'"'.contains(ch[0]));
 
     if (_isTesting) {
       // Emit assuming url() was parsed; most suite tests use url function.
@@ -229,7 +223,7 @@ class CssPrinter extends Visitor {
   }
 
   void visitNamespaceDirective(NamespaceDirective node) {
-    bool isStartingQuote(String ch) => ('\'"'.indexOf(ch) >= 0);
+    bool isStartingQuote(String ch) => ('\'"'.contains(ch));
 
     if (isStartingQuote(node._uri)) {
       emit(' @namespace ${node.prefix}"${node._uri}"');
@@ -265,10 +259,8 @@ class CssPrinter extends Visitor {
     emit('}');
   }
 
-  /**
-   * Added optional newLine for handling @include at top-level vs/ inside of
-   * a declaration group.
-   */
+  /// Added optional newLine for handling @include at top-level vs/ inside of
+  /// a declaration group.
   void visitIncludeDirective(IncludeDirective node, [bool topLevel = true]) {
     if (topLevel) emit(_newLine);
     emit('@include ${node.name}');
@@ -425,7 +417,7 @@ class CssPrinter extends Visitor {
   }
 
   void visitHexColorTerm(HexColorTerm node) {
-    var mappedName;
+    String mappedName;
     if (_isTesting && (node.value is! BAD_HEX_VALUE)) {
       mappedName = TokenKind.hexToColorName(node.value);
     }

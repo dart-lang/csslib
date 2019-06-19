@@ -2,23 +2,23 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of csslib.parser;
+part of '../parser.dart';
 
 class Tokenizer extends TokenizerBase {
-  /** U+ prefix for unicode characters. */
+  /// U+ prefix for unicode characters.
   final UNICODE_U = 'U'.codeUnitAt(0);
   final UNICODE_LOWER_U = 'u'.codeUnitAt(0);
   final UNICODE_PLUS = '+'.codeUnitAt(0);
 
   final QUESTION_MARK = '?'.codeUnitAt(0);
 
-  /** CDATA keyword. */
-  final List CDATA_NAME = 'CDATA'.codeUnits;
+  /// CDATA keyword.
+  final List<int> CDATA_NAME = 'CDATA'.codeUnits;
 
   Tokenizer(SourceFile file, String text, bool skipWhitespace, [int index = 0])
       : super(file, text, skipWhitespace, index);
 
-  Token next({unicodeRange: false}) {
+  Token next({bool unicodeRange = false}) {
     // keep track of our starting position
     _startIndex = _index;
 
@@ -241,7 +241,7 @@ class Tokenizer extends TokenizerBase {
         (_peekChar() == '-'.codeUnitAt(0));
   }
 
-  Token _errorToken([String message = null]) {
+  Token _errorToken([String message]) {
     return _finishToken(TokenKind.ERROR);
   }
 
@@ -314,9 +314,9 @@ class Tokenizer extends TokenizerBase {
     }
 
     var span = _file.span(_startIndex, _index);
-    var text = new String.fromCharCodes(chars);
+    var text = String.fromCharCodes(chars);
 
-    return new IdentifierToken(text, getIdentifierKind(), span);
+    return IdentifierToken(text, getIdentifierKind(), span);
   }
 
   Token finishNumber() {
@@ -431,7 +431,7 @@ class Tokenizer extends TokenizerBase {
   }
 }
 
-/** Static helper methods. */
+/// Static helper methods.
 class TokenizerHelpers {
   static bool isIdentifierStart(int c) {
     return isIdentifierStartExpr(c) || c == 45 /*-*/;
@@ -451,7 +451,7 @@ class TokenizerHelpers {
     return isIdentifierPartExpr(c) || c == 45 /*-*/;
   }
 
-  /** Pseudo function expressions identifiers can't have a minus sign. */
+  /// Pseudo function expressions identifiers can't have a minus sign.
   static bool isIdentifierStartExpr(int c) {
     return ((c >= 97 /*a*/ && c <= 122 /*z*/) ||
         (c >= 65 /*A*/ && c <= 90 /*Z*/) ||
@@ -464,7 +464,7 @@ class TokenizerHelpers {
         c == 92 /*\*/);
   }
 
-  /** Pseudo function expressions identifiers can't have a minus sign. */
+  /// Pseudo function expressions identifiers can't have a minus sign.
   static bool isIdentifierPartExpr(int c) {
     return (isIdentifierStartExpr(c) || isDigit(c));
   }

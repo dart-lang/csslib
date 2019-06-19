@@ -2,8 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library csslib.visitor;
-
 import 'package:source_span/source_span.dart';
 import 'parser.dart';
 
@@ -116,9 +114,9 @@ abstract class VisitorBase {
   visitWidthExpression(WidthExpression node);
 }
 
-/** Base vistor class for the style sheet AST. */
+/// Base vistor class for the style sheet AST.
 class Visitor implements VisitorBase {
-  /** Helper function to walk a list of nodes. */
+  /// Helper function to walk a list of nodes.
   void _visitNodeList(List<TreeNode> list) {
     // Don't use iterable otherwise the list can't grow while using Visitor.
     // It certainly can't have items deleted before the index being iterated
@@ -436,12 +434,12 @@ class Visitor implements VisitorBase {
 
   visitBinaryExpression(BinaryExpression node) {
     // TODO(terry): TBD
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   visitUnaryExpression(UnaryExpression node) {
     // TODO(terry): TBD
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   visitIdentifier(Identifier node) {}
@@ -456,36 +454,36 @@ class Visitor implements VisitorBase {
 
   visitFontExpression(FontExpression node) {
     // TODO(terry): TBD
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   visitBoxExpression(BoxExpression node) {
     // TODO(terry): TBD
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   visitMarginExpression(MarginExpression node) {
     // TODO(terry): TBD
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   visitBorderExpression(BorderExpression node) {
     // TODO(terry): TBD
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   visitHeightExpression(HeightExpression node) {
     // TODO(terry): TB
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   visitPaddingExpression(PaddingExpression node) {
     // TODO(terry): TBD
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 
   visitWidthExpression(WidthExpression node) {
     // TODO(terry): TBD
-    throw new UnimplementedError();
+    throw UnimplementedError();
   }
 }

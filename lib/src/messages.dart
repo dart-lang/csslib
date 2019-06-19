@@ -2,61 +2,56 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library csslib.src.messages;
-
-import 'package:logging/logging.dart' show Level;
 import 'package:source_span/source_span.dart';
 
-import 'options.dart';
+import 'preprocessor_options.dart';
+
+enum MessageLevel { info, warning, severe }
 
 // TODO(terry): Remove the global messages, use some object that tracks
 //              compilation state.
 
-/** The global [Messages] for tracking info/warnings/messages. */
+/// The global [Messages] for tracking info/warnings/messages.
 Messages messages;
 
 // Color constants used for generating messages.
-final String GREEN_COLOR = '\u001b[32m';
-final String RED_COLOR = '\u001b[31m';
-final String MAGENTA_COLOR = '\u001b[35m';
-final String NO_COLOR = '\u001b[0m';
+const _greenColor = '\u001b[32m';
+const _redColor = '\u001b[31m';
+const _magentaColor = '\u001b[35m';
+const _noColor = '\u001b[0m';
 
-/** Map between error levels and their display color. */
-final Map<Level, String> _ERROR_COLORS = (() {
-  var colorsMap = new Map<Level, String>();
-  colorsMap[Level.SEVERE] = RED_COLOR;
-  colorsMap[Level.WARNING] = MAGENTA_COLOR;
-  colorsMap[Level.INFO] = GREEN_COLOR;
-  return colorsMap;
-})();
+/// Map between error levels and their display color.
+const Map<MessageLevel, String> _errorColors = {
+  MessageLevel.severe: _redColor,
+  MessageLevel.warning: _magentaColor,
+  MessageLevel.info: _greenColor,
+};
 
-/** Map between error levels and their friendly name. */
-final Map<Level, String> _ERROR_LABEL = (() {
-  var labels = new Map<Level, String>();
-  labels[Level.SEVERE] = 'error';
-  labels[Level.WARNING] = 'warning';
-  labels[Level.INFO] = 'info';
-  return labels;
-})();
+/// Map between error levels and their friendly name.
+const Map<MessageLevel, String> _errorLabel = {
+  MessageLevel.severe: 'error',
+  MessageLevel.warning: 'warning',
+  MessageLevel.info: 'info',
+};
 
-/** A single message from the compiler. */
+/// A single message from the compiler.
 class Message {
-  final Level level;
+  final MessageLevel level;
   final String message;
   final SourceSpan span;
   final bool useColors;
 
-  Message(this.level, this.message, {SourceSpan span, bool useColors: false})
+  Message(this.level, this.message, {SourceSpan span, bool useColors = false})
       : this.span = span,
         this.useColors = useColors;
 
   String toString() {
-    var output = new StringBuffer();
-    bool colors = useColors && _ERROR_COLORS.containsKey(level);
-    var levelColor = colors ? _ERROR_COLORS[level] : null;
+    var output = StringBuffer();
+    bool colors = useColors && _errorColors.containsKey(level);
+    var levelColor = colors ? _errorColors[level] : null;
     if (colors) output.write(levelColor);
-    output..write(_ERROR_LABEL[level])..write(' ');
-    if (colors) output.write(NO_COLOR);
+    output..write(_errorLabel[level])..write(' ');
+    if (colors) output.write(_noColor);
 
     if (span == null) {
       output.write(message);
@@ -69,26 +64,22 @@ class Message {
   }
 }
 
-typedef void PrintHandler(Message obj);
-
-/**
- * This class tracks and prints information, warnings, and errors emitted by the
- * compiler.
- */
+/// This class tracks and prints information, warnings, and errors emitted by
+/// the compiler.
 class Messages {
-  /** Called on every error. Set to blank function to supress printing. */
-  final PrintHandler printHandler;
+  /// Called on every error. Set to blank function to supress printing.
+  final void Function(Message obj) printHandler;
 
   final PreprocessorOptions options;
 
   final List<Message> messages = <Message>[];
 
-  Messages({PreprocessorOptions options, this.printHandler: print})
-      : options = options != null ? options : new PreprocessorOptions();
+  Messages({PreprocessorOptions options, this.printHandler = print})
+      : options = options != null ? options : PreprocessorOptions();
 
-  /** Report a compile-time CSS error. */
+  /// Report a compile-time CSS error.
   void error(String message, SourceSpan span) {
-    var msg = new Message(Level.SEVERE, message,
+    var msg = Message(MessageLevel.severe, message,
         span: span, useColors: options.useColors);
 
     messages.add(msg);
@@ -96,21 +87,21 @@ class Messages {
     printHandler(msg);
   }
 
-  /** Report a compile-time CSS warning. */
+  /// Report a compile-time CSS warning.
   void warning(String message, SourceSpan span) {
     if (options.warningsAsErrors) {
       error(message, span);
     } else {
-      var msg = new Message(Level.WARNING, message,
+      var msg = Message(MessageLevel.warning, message,
           span: span, useColors: options.useColors);
 
       messages.add(msg);
     }
   }
 
-  /** Report and informational message about what the compiler is doing. */
+  /// Report and informational message about what the compiler is doing.
   void info(String message, SourceSpan span) {
-    var msg = new Message(Level.INFO, message,
+    var msg = Message(MessageLevel.info, message,
         span: span, useColors: options.useColors);
 
     messages.add(msg);
@@ -118,11 +109,12 @@ class Messages {
     if (options.verbose) printHandler(msg);
   }
 
-  /** Merge [newMessages] to this message lsit. */
+  /// Merge [newMessages] to this message lsit.
   void mergeMessages(Messages newMessages) {
     messages.addAll(newMessages.messages);
     newMessages.messages
-        .where((message) => message.level == Level.SEVERE || options.verbose)
+        .where((message) =>
+            message.level == MessageLevel.severe || options.verbose)
         .forEach(printHandler);
   }
 }

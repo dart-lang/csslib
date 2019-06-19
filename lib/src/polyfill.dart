@@ -2,44 +2,37 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of csslib.parser;
+part of '../parser.dart';
 
-/**
- * CSS polyfill emits CSS to be understood by older parsers that which do not
- * understand (var, calc, etc.).
- */
+/// CSS polyfill emits CSS to be understood by older parsers that which do not
+/// understand (var, calc, etc.).
 class PolyFill {
   final Messages _messages;
-  Map<String, VarDefinition> _allVarDefinitions =
-      new Map<String, VarDefinition>();
+  Map<String, VarDefinition> _allVarDefinitions = Map<String, VarDefinition>();
 
-  Set<StyleSheet> allStyleSheets = new Set<StyleSheet>();
+  Set<StyleSheet> allStyleSheets = Set<StyleSheet>();
 
-  /**
-   * [_pseudoElements] list of known pseudo attributes found in HTML, any
-   * CSS pseudo-elements 'name::custom-element' is mapped to the manged name
-   * associated with the pseudo-element key.
-   */
+  /// [_pseudoElements] list of known pseudo attributes found in HTML, any
+  /// CSS pseudo-elements 'name::custom-element' is mapped to the manged name
+  /// associated with the pseudo-element key.
   PolyFill(this._messages);
 
-  /**
-   * Run the analyzer on every file that is a style sheet or any component that
-   * has a style tag.
-   */
-  void process(StyleSheet styleSheet, {List<StyleSheet> includes: null}) {
+  /// Run the analyzer on every file that is a style sheet or any component that
+  /// has a style tag.
+  void process(StyleSheet styleSheet, {List<StyleSheet> includes}) {
     if (includes != null) {
       processVarDefinitions(includes);
     }
     processVars(styleSheet);
 
     // Remove all var definitions for this style sheet.
-    new _RemoveVarDefinitions().visitTree(styleSheet);
+    _RemoveVarDefinitions().visitTree(styleSheet);
   }
 
-  /** Process all includes looking for var definitions. */
+  /// Process all includes looking for var definitions.
   void processVarDefinitions(List<StyleSheet> includes) {
     for (var include in includes) {
-      _allVarDefinitions = (new _VarDefinitionsIncludes(_allVarDefinitions)
+      _allVarDefinitions = (_VarDefinitionsIncludes(_allVarDefinitions)
             ..visitTree(include))
           .varDefs;
     }
@@ -48,7 +41,7 @@ class PolyFill {
   void processVars(StyleSheet styleSheet) {
     // Build list of all var definitions.
     var mainStyleSheetVarDefs =
-        (new _VarDefAndUsage(this._messages, _allVarDefinitions)
+        (_VarDefAndUsage(this._messages, _allVarDefinitions)
               ..visitTree(styleSheet))
             .varDefs;
 
@@ -62,7 +55,7 @@ class PolyFill {
   }
 }
 
-/** Build list of all var definitions in all includes. */
+/// Build list of all var definitions in all includes.
 class _VarDefinitionsIncludes extends Visitor {
   final Map<String, VarDefinition> varDefs;
 
@@ -83,14 +76,12 @@ class _VarDefinitionsIncludes extends Visitor {
   }
 }
 
-/**
- * Find var- definitions in a style sheet.
- * [found] list of known definitions.
- */
+/// Find var- definitions in a style sheet.
+/// [found] list of known definitions.
 class _VarDefAndUsage extends Visitor {
   final Messages _messages;
   final Map<String, VarDefinition> _knownVarDefs;
-  final Map<String, VarDefinition> varDefs = new Map<String, VarDefinition>();
+  final Map<String, VarDefinition> varDefs = Map<String, VarDefinition>();
 
   VarDefinition currVarDefinition;
   List<Expression> currentExpressions;
@@ -206,7 +197,7 @@ class _VarDefAndUsage extends Visitor {
   }
 }
 
-/** Remove all var definitions. */
+/// Remove all var definitions.
 class _RemoveVarDefinitions extends Visitor {
   void visitTree(StyleSheet tree) {
     visitStyleSheet(tree);
@@ -223,7 +214,7 @@ class _RemoveVarDefinitions extends Visitor {
   }
 }
 
-/** Find terminal definition (non VarUsage implies real CSS value). */
+/// Find terminal definition (non VarUsage implies real CSS value).
 VarDefinition _findTerminalVarDefinition(
     Map<String, VarDefinition> varDefs, VarDefinition varDef) {
   var expressions = varDef.expression as Expressions;

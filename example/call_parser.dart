@@ -4,17 +4,15 @@
 import 'package:csslib/parser.dart' as css;
 import 'package:csslib/visitor.dart';
 
-const _default = const css.PreprocessorOptions(
+const _default = css.PreprocessorOptions(
     useColors: false,
     checked: true,
     warningsAsErrors: true,
     inputFile: 'memory');
 
-/**
- * Spin-up CSS parser in checked mode to detect any problematic CSS.  Normally,
- * CSS will allow any property/value pairs regardless of validity; all of our
- * tests (by default) will ensure that the CSS is really valid.
- */
+/// Spin-up CSS parser in checked mode to detect any problematic CSS.  Normally,
+/// CSS will allow any property/value pairs regardless of validity; all of our
+/// tests (by default) will ensure that the CSS is really valid.
 StyleSheet parseCss(String cssInput,
     {List<css.Message> errors, css.PreprocessorOptions opts}) {
   return css.parse(cssInput,
@@ -22,7 +20,7 @@ StyleSheet parseCss(String cssInput,
 }
 
 // Pretty printer for CSS.
-var emitCss = new CssPrinter();
+var emitCss = CssPrinter();
 String prettyPrint(StyleSheet ss) =>
     (emitCss..visitTree(ss, pretty: true)).toString();
 

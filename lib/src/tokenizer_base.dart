@@ -305,7 +305,7 @@ abstract class TokenizerBase {
         _maybeEatChar(TokenChar.NEWLINE);
         return finishMultilineString(quote);
       } else {
-        return _makeStringToken(List<int>(), false);
+        return _makeStringToken(<int>[], false);
       }
     }
     return finishStringBody(quote);
@@ -341,7 +341,7 @@ abstract class TokenizerBase {
   }
 
   Token finishStringBody(int quote) {
-    var buf = List<int>();
+    var buf = <int>[];
     while (true) {
       int ch = _nextChar();
       if (ch == quote) {

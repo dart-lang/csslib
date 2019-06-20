@@ -8,9 +8,9 @@ part of '../parser.dart';
 /// understand (var, calc, etc.).
 class PolyFill {
   final Messages _messages;
-  Map<String, VarDefinition> _allVarDefinitions = Map<String, VarDefinition>();
+  Map<String, VarDefinition> _allVarDefinitions = <String, VarDefinition>{};
 
-  Set<StyleSheet> allStyleSheets = Set<StyleSheet>();
+  Set<StyleSheet> allStyleSheets = <StyleSheet>{};
 
   /// [_pseudoElements] list of known pseudo attributes found in HTML, any
   /// CSS pseudo-elements 'name::custom-element' is mapped to the manged name
@@ -81,7 +81,7 @@ class _VarDefinitionsIncludes extends Visitor {
 class _VarDefAndUsage extends Visitor {
   final Messages _messages;
   final Map<String, VarDefinition> _knownVarDefs;
-  final Map<String, VarDefinition> varDefs = Map<String, VarDefinition>();
+  final Map<String, VarDefinition> varDefs = <String, VarDefinition>{};
 
   VarDefinition currVarDefinition;
   List<Expression> currentExpressions;

@@ -7,3 +7,4 @@ linter:
   - slash_for_doc_comments
   - unnecessary_const
   - unnecessary_new
+  - prefer_collection_literals

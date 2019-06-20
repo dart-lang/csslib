@@ -571,7 +571,7 @@ class TokenKind {
   static String decimalToHex(int number, [int minDigits = 1]) {
     final String _HEX_DIGITS = '0123456789abcdef';
 
-    List<String> result = List<String>();
+    var result = <String>[];
 
     int dividend = number >> 4;
     int remain = number % 16;

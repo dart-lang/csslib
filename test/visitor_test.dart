@@ -12,7 +12,7 @@ import 'testing.dart';
 
 class ClassVisitor extends Visitor {
   final List expectedClasses;
-  final Set<String> foundClasses = Set();
+  final foundClasses = <String>{};
 
   ClassVisitor(this.expectedClasses);
 

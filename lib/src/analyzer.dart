@@ -186,7 +186,7 @@ class ExpandNestedSelectors extends Visitor {
   List<RuleSet> _expandedRuleSets = [];
 
   /// Maping of a nested rule set to the fully expanded list of RuleSet(s).
-  final Map<RuleSet, List<RuleSet>> _expansions = Map();
+  final _expansions = <RuleSet, List<RuleSet>>{};
 
   void visitRuleSet(RuleSet node) {
     final oldParent = _parentRuleSet;
@@ -418,7 +418,7 @@ class TopLevelIncludes extends Visitor {
   final Messages _messages;
 
   /// Map of variable name key to it's definition.
-  final Map<String, MixinDefinition> map = Map<String, MixinDefinition>();
+  final map = <String, MixinDefinition>{};
   MixinDefinition currDef;
 
   static void expand(Messages messages, List<StyleSheet> styleSheets) {
@@ -556,7 +556,7 @@ class CallMixin extends Visitor {
   Expressions _currExpressions;
   int _currIndex = -1;
 
-  final varUsages = Map<String, Map<Expressions, Set<int>>>();
+  final varUsages = <String, Map<Expressions, Set<int>>>{};
 
   /// Only var defs with more than one expression (comma separated).
   final Map<String, VarDefinition> varDefs;
@@ -636,7 +636,7 @@ class CallMixin extends Visitor {
   }
 
   void _addExpression(Map<Expressions, Set<int>> expressions) {
-    var indexSet = Set<int>();
+    var indexSet = <int>{};
     indexSet.add(_currIndex);
     expressions[_currExpressions] = indexSet;
   }
@@ -653,7 +653,7 @@ class CallMixin extends Visitor {
         allIndexes.add(_currIndex);
       }
     } else {
-      var newExpressions = Map<Expressions, Set<int>>();
+      var newExpressions = <Expressions, Set<int>>{};
       _addExpression(newExpressions);
       varUsages[node.name] = newExpressions;
     }
@@ -677,15 +677,15 @@ class DeclarationIncludes extends Visitor {
   final Messages _messages;
 
   /// Map of variable name key to it's definition.
-  final Map<String, MixinDefinition> map = Map<String, MixinDefinition>();
+  final Map<String, MixinDefinition> map = <String, MixinDefinition>{};
 
   /// Cache of mixin called with parameters.
-  final Map<String, CallMixin> callMap = Map<String, CallMixin>();
+  final Map<String, CallMixin> callMap = <String, CallMixin>{};
   MixinDefinition currDef;
   DeclarationGroup currDeclGroup;
 
   /// Var definitions with more than 1 expression.
-  final Map<String, VarDefinition> varDefs = Map<String, VarDefinition>();
+  final Map<String, VarDefinition> varDefs = <String, VarDefinition>{};
 
   static void expand(Messages messages, List<StyleSheet> styleSheets) {
     DeclarationIncludes(messages, styleSheets);
@@ -880,7 +880,7 @@ class MixinsAndIncludes extends Visitor {
 /// Find all @extend to create inheritance.
 class AllExtends extends Visitor {
   final Map<String, List<SelectorGroup>> inherits =
-      Map<String, List<SelectorGroup>>();
+      <String, List<SelectorGroup>>{};
 
   SelectorGroup _currSelectorGroup;
   int _currDeclIndex;

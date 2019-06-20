@@ -172,15 +172,15 @@ class Parser {
 }
 
 // CSS2.1 pseudo-elements which were defined with a single ':'.
-final _legacyPseudoElements = Set<String>.from(const [
+const _legacyPseudoElements = {
   'after',
   'before',
   'first-letter',
   'first-line',
-]);
+};
 
 // CSS3 functional pseudo-classes (https://www.w3.org/TR/2018/REC-selectors-3-20181106/#selectors)
-final _functionalPseudoClasses = {
+const _functionalPseudoClasses = {
   'nth-child',
   'nth-last-child',
   'nth-of-type',
@@ -189,7 +189,7 @@ final _functionalPseudoClasses = {
   'not',
 };
 
-final _compoundSelectors = {
+const _compoundSelectors = {
   'host',
   'host-context',
 };

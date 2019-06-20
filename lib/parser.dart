@@ -180,19 +180,19 @@ final _legacyPseudoElements = Set<String>.from(const [
 ]);
 
 // CSS3 functional pseudo-classes (https://www.w3.org/TR/2018/REC-selectors-3-20181106/#selectors)
-final _functionalPseudoClasses = new Set<String>.from(const [
+final _functionalPseudoClasses = {
   'nth-child',
   'nth-last-child',
   'nth-of-type',
   'nth-last-of-type',
   'lang',
   'not',
-]);
+};
 
-final _compoundSelectors = new Set<String>.from(const [
+final _compoundSelectors = {
   'host',
   'host-context',
-]);
+};
 
 /// A simple recursive descent parser for CSS.
 class _Parser {

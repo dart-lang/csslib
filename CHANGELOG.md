@@ -1,6 +1,7 @@
 ## 0.16.1
 
 - Fixed a crashed caused by parsing functional pseudo as simple selector
+- Require Dart SDK `>=2.2.0`.
 
 ## 0.16.0
 

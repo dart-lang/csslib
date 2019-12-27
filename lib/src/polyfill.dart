@@ -198,7 +198,8 @@ class _VarDefAndUsage extends Visitor {
     return result;
   }
 
-  void _resolveVarUsage(List<Expression> expressions, int index, VarDefinition def) {
+  void _resolveVarUsage(
+      List<Expression> expressions, int index, VarDefinition def) {
     var defExpressions = (def.expression as Expressions).expressions;
     expressions.replaceRange(index, index + 1, defExpressions);
   }

@@ -363,7 +363,8 @@ class PseudoClassFunctionSelector extends PseudoClassSelector {
   SelectorExpression get expression => _argument as SelectorExpression;
 
   @override
-  void visit(VisitorBase visitor) => visitor.visitPseudoClassFunctionSelector(this);
+  void visit(VisitorBase visitor) =>
+      visitor.visitPseudoClassFunctionSelector(this);
 }
 
 // ::pseudoElementFunction(expression)
@@ -551,7 +552,8 @@ class SupportsConditionInParens extends SupportsCondition {
       SupportsConditionInParens(condition.clone(), span);
 
   @override
-  void visit(VisitorBase visitor) => visitor.visitSupportsConditionInParens(this);
+  void visit(VisitorBase visitor) =>
+      visitor.visitSupportsConditionInParens(this);
 }
 
 class SupportsNegation extends SupportsCondition {
@@ -968,7 +970,8 @@ class MixinDeclarationDirective extends MixinDefinition {
   }
 
   @override
-  void visit(VisitorBase visitor) => visitor.visitMixinDeclarationDirective(this);
+  void visit(VisitorBase visitor) =>
+      visitor.visitMixinDeclarationDirective(this);
 }
 
 /// To support consuming a Sass mixin @include.
@@ -1074,7 +1077,8 @@ class IncludeMixinAtDeclaration extends Declaration {
       IncludeMixinAtDeclaration(include.clone(), span);
 
   @override
-  void visit(VisitorBase visitor) => visitor.visitIncludeMixinAtDeclaration(this);
+  void visit(VisitorBase visitor) =>
+      visitor.visitIncludeMixinAtDeclaration(this);
 }
 
 class ExtendDeclaration extends Declaration {

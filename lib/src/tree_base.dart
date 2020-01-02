@@ -14,7 +14,7 @@ abstract class TreeNode {
   TreeNode clone();
 
   /// Classic double-dispatch visitor for implementing passes.
-  void visit(VisitorBase visitor);
+  T visit<T>(VisitorBase<T> visitor);
 
   /// A multiline string showing the node and its children.
   String toDebugString() {
@@ -34,7 +34,7 @@ abstract class Expression extends TreeNode {
 class TreeOutput {
   int depth = 0;
   final StringBuffer buf = StringBuffer();
-  VisitorBase printer;
+  VisitorBase<void> printer;
 
   void write(String s) {
     for (var i = 0; i < depth; i++) {

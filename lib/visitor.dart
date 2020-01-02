@@ -10,112 +10,112 @@ part 'src/tree.dart';
 part 'src/tree_base.dart';
 part 'src/tree_printer.dart';
 
-abstract class VisitorBase<T> {
-  T visitCalcTerm(CalcTerm node);
-  T visitCssComment(CssComment node);
-  T visitCommentDefinition(CommentDefinition node);
-  T visitStyleSheet(StyleSheet node);
-  T visitNoOp(NoOp node);
-  T visitTopLevelProduction(TopLevelProduction node);
-  T visitDirective(Directive node);
-  T visitDocumentDirective(DocumentDirective node);
-  T visitSupportsDirective(SupportsDirective node);
-  T visitSupportsConditionInParens(SupportsConditionInParens node);
-  T visitSupportsNegation(SupportsNegation node);
-  T visitSupportsConjunction(SupportsConjunction node);
-  T visitSupportsDisjunction(SupportsDisjunction node);
-  T visitViewportDirective(ViewportDirective node);
-  T visitMediaExpression(MediaExpression node);
-  T visitMediaQuery(MediaQuery node);
-  T visitMediaDirective(MediaDirective node);
-  T visitHostDirective(HostDirective node);
-  T visitPageDirective(PageDirective node);
-  T visitCharsetDirective(CharsetDirective node);
-  T visitImportDirective(ImportDirective node);
-  T visitKeyFrameDirective(KeyFrameDirective node);
-  T visitKeyFrameBlock(KeyFrameBlock node);
-  T visitFontFaceDirective(FontFaceDirective node);
-  T visitStyletDirective(StyletDirective node);
-  T visitNamespaceDirective(NamespaceDirective node);
-  T visitVarDefinitionDirective(VarDefinitionDirective node);
-  T visitMixinDefinition(MixinDefinition node);
-  T visitMixinRulesetDirective(MixinRulesetDirective node);
-  T visitMixinDeclarationDirective(MixinDeclarationDirective node);
-  T visitIncludeDirective(IncludeDirective node);
-  T visitContentDirective(ContentDirective node);
+abstract class VisitorBase {
+  dynamic visitCalcTerm(CalcTerm node);
+  dynamic visitCssComment(CssComment node);
+  dynamic visitCommentDefinition(CommentDefinition node);
+  dynamic visitStyleSheet(StyleSheet node);
+  dynamic visitNoOp(NoOp node);
+  dynamic visitTopLevelProduction(TopLevelProduction node);
+  dynamic visitDirective(Directive node);
+  dynamic visitDocumentDirective(DocumentDirective node);
+  dynamic visitSupportsDirective(SupportsDirective node);
+  dynamic visitSupportsConditionInParens(SupportsConditionInParens node);
+  dynamic visitSupportsNegation(SupportsNegation node);
+  dynamic visitSupportsConjunction(SupportsConjunction node);
+  dynamic visitSupportsDisjunction(SupportsDisjunction node);
+  dynamic visitViewportDirective(ViewportDirective node);
+  dynamic visitMediaExpression(MediaExpression node);
+  dynamic visitMediaQuery(MediaQuery node);
+  dynamic visitMediaDirective(MediaDirective node);
+  dynamic visitHostDirective(HostDirective node);
+  dynamic visitPageDirective(PageDirective node);
+  dynamic visitCharsetDirective(CharsetDirective node);
+  dynamic visitImportDirective(ImportDirective node);
+  dynamic visitKeyFrameDirective(KeyFrameDirective node);
+  dynamic visitKeyFrameBlock(KeyFrameBlock node);
+  dynamic visitFontFaceDirective(FontFaceDirective node);
+  dynamic visitStyletDirective(StyletDirective node);
+  dynamic visitNamespaceDirective(NamespaceDirective node);
+  dynamic visitVarDefinitionDirective(VarDefinitionDirective node);
+  dynamic visitMixinDefinition(MixinDefinition node);
+  dynamic visitMixinRulesetDirective(MixinRulesetDirective node);
+  dynamic visitMixinDeclarationDirective(MixinDeclarationDirective node);
+  dynamic visitIncludeDirective(IncludeDirective node);
+  dynamic visitContentDirective(ContentDirective node);
 
-  T visitRuleSet(RuleSet node);
-  T visitDeclarationGroup(DeclarationGroup node);
-  T visitMarginGroup(MarginGroup node);
-  T visitDeclaration(Declaration node);
-  T visitVarDefinition(VarDefinition node);
-  T visitIncludeMixinAtDeclaration(IncludeMixinAtDeclaration node);
-  T visitExtendDeclaration(ExtendDeclaration node);
-  T visitSelectorGroup(SelectorGroup node);
-  T visitSelector(Selector node);
-  T visitSimpleSelectorSequence(SimpleSelectorSequence node);
-  T visitSimpleSelector(SimpleSelector node);
-  T visitElementSelector(ElementSelector node);
-  T visitNamespaceSelector(NamespaceSelector node);
-  T visitAttributeSelector(AttributeSelector node);
-  T visitIdSelector(IdSelector node);
-  T visitClassSelector(ClassSelector node);
-  T visitPseudoClassSelector(PseudoClassSelector node);
-  T visitPseudoElementSelector(PseudoElementSelector node);
-  T visitPseudoClassFunctionSelector(PseudoClassFunctionSelector node);
-  T visitPseudoElementFunctionSelector(PseudoElementFunctionSelector node);
-  T visitNegationSelector(NegationSelector node);
-  T visitSelectorExpression(SelectorExpression node);
+  dynamic visitRuleSet(RuleSet node);
+  dynamic visitDeclarationGroup(DeclarationGroup node);
+  dynamic visitMarginGroup(MarginGroup node);
+  dynamic visitDeclaration(Declaration node);
+  dynamic visitVarDefinition(VarDefinition node);
+  dynamic visitIncludeMixinAtDeclaration(IncludeMixinAtDeclaration node);
+  dynamic visitExtendDeclaration(ExtendDeclaration node);
+  dynamic visitSelectorGroup(SelectorGroup node);
+  dynamic visitSelector(Selector node);
+  dynamic visitSimpleSelectorSequence(SimpleSelectorSequence node);
+  dynamic visitSimpleSelector(SimpleSelector node);
+  dynamic visitElementSelector(ElementSelector node);
+  dynamic visitNamespaceSelector(NamespaceSelector node);
+  dynamic visitAttributeSelector(AttributeSelector node);
+  dynamic visitIdSelector(IdSelector node);
+  dynamic visitClassSelector(ClassSelector node);
+  dynamic visitPseudoClassSelector(PseudoClassSelector node);
+  dynamic visitPseudoElementSelector(PseudoElementSelector node);
+  dynamic visitPseudoClassFunctionSelector(PseudoClassFunctionSelector node);
+  dynamic visitPseudoElementFunctionSelector(PseudoElementFunctionSelector node);
+  dynamic visitNegationSelector(NegationSelector node);
+  dynamic visitSelectorExpression(SelectorExpression node);
 
-  T visitUnicodeRangeTerm(UnicodeRangeTerm node);
-  T visitLiteralTerm(LiteralTerm node);
-  T visitHexColorTerm(HexColorTerm node);
-  T visitNumberTerm(NumberTerm node);
-  T visitUnitTerm(UnitTerm node);
-  T visitLengthTerm(LengthTerm node);
-  T visitPercentageTerm(PercentageTerm node);
-  T visitEmTerm(EmTerm node);
-  T visitExTerm(ExTerm node);
-  T visitAngleTerm(AngleTerm node);
-  T visitTimeTerm(TimeTerm node);
-  T visitFreqTerm(FreqTerm node);
-  T visitFractionTerm(FractionTerm node);
-  T visitUriTerm(UriTerm node);
-  T visitResolutionTerm(ResolutionTerm node);
-  T visitChTerm(ChTerm node);
-  T visitRemTerm(RemTerm node);
-  T visitViewportTerm(ViewportTerm node);
-  T visitFunctionTerm(FunctionTerm node);
-  T visitGroupTerm(GroupTerm node);
-  T visitItemTerm(ItemTerm node);
-  T visitIE8Term(IE8Term node);
-  T visitOperatorSlash(OperatorSlash node);
-  T visitOperatorComma(OperatorComma node);
-  T visitOperatorPlus(OperatorPlus node);
-  T visitOperatorMinus(OperatorMinus node);
-  T visitVarUsage(VarUsage node);
+  dynamic visitUnicodeRangeTerm(UnicodeRangeTerm node);
+  dynamic visitLiteralTerm(LiteralTerm node);
+  dynamic visitHexColorTerm(HexColorTerm node);
+  dynamic visitNumberTerm(NumberTerm node);
+  dynamic visitUnitTerm(UnitTerm node);
+  dynamic visitLengthTerm(LengthTerm node);
+  dynamic visitPercentageTerm(PercentageTerm node);
+  dynamic visitEmTerm(EmTerm node);
+  dynamic visitExTerm(ExTerm node);
+  dynamic visitAngleTerm(AngleTerm node);
+  dynamic visitTimeTerm(TimeTerm node);
+  dynamic visitFreqTerm(FreqTerm node);
+  dynamic visitFractionTerm(FractionTerm node);
+  dynamic visitUriTerm(UriTerm node);
+  dynamic visitResolutionTerm(ResolutionTerm node);
+  dynamic visitChTerm(ChTerm node);
+  dynamic visitRemTerm(RemTerm node);
+  dynamic visitViewportTerm(ViewportTerm node);
+  dynamic visitFunctionTerm(FunctionTerm node);
+  dynamic visitGroupTerm(GroupTerm node);
+  dynamic visitItemTerm(ItemTerm node);
+  dynamic visitIE8Term(IE8Term node);
+  dynamic visitOperatorSlash(OperatorSlash node);
+  dynamic visitOperatorComma(OperatorComma node);
+  dynamic visitOperatorPlus(OperatorPlus node);
+  dynamic visitOperatorMinus(OperatorMinus node);
+  dynamic visitVarUsage(VarUsage node);
 
-  T visitExpressions(Expressions node);
-  T visitBinaryExpression(BinaryExpression node);
-  T visitUnaryExpression(UnaryExpression node);
+  dynamic visitExpressions(Expressions node);
+  dynamic visitBinaryExpression(BinaryExpression node);
+  dynamic visitUnaryExpression(UnaryExpression node);
 
-  T visitIdentifier(Identifier node);
-  T visitWildcard(Wildcard node);
-  T visitThisOperator(ThisOperator node);
-  T visitNegation(Negation node);
+  dynamic visitIdentifier(Identifier node);
+  dynamic visitWildcard(Wildcard node);
+  dynamic visitThisOperator(ThisOperator node);
+  dynamic visitNegation(Negation node);
 
-  T visitDartStyleExpression(DartStyleExpression node);
-  T visitFontExpression(FontExpression node);
-  T visitBoxExpression(BoxExpression node);
-  T visitMarginExpression(MarginExpression node);
-  T visitBorderExpression(BorderExpression node);
-  T visitHeightExpression(HeightExpression node);
-  T visitPaddingExpression(PaddingExpression node);
-  T visitWidthExpression(WidthExpression node);
+  dynamic visitDartStyleExpression(DartStyleExpression node);
+  dynamic visitFontExpression(FontExpression node);
+  dynamic visitBoxExpression(BoxExpression node);
+  dynamic visitMarginExpression(MarginExpression node);
+  dynamic visitBorderExpression(BorderExpression node);
+  dynamic visitHeightExpression(HeightExpression node);
+  dynamic visitPaddingExpression(PaddingExpression node);
+  dynamic visitWidthExpression(WidthExpression node);
 }
 
 /// Base vistor class for the style sheet AST.
-class Visitor implements VisitorBase<void> {
+class Visitor implements VisitorBase {
   /// Helper function to walk a list of nodes.
   void _visitNodeList(List<TreeNode> list) {
     // Don't use iterable otherwise the list can't grow while using Visitor.
@@ -126,96 +126,96 @@ class Visitor implements VisitorBase<void> {
     }
   }
 
-  void visitTree(StyleSheet tree) => visitStyleSheet(tree);
+  dynamic visitTree(StyleSheet tree) => visitStyleSheet(tree);
 
   @override
-  void visitStyleSheet(StyleSheet ss) {
+  dynamic visitStyleSheet(StyleSheet ss) {
     _visitNodeList(ss.topLevels);
   }
 
   @override
-  void visitNoOp(NoOp node) {}
+  dynamic visitNoOp(NoOp node) {}
 
   @override
-  void visitTopLevelProduction(TopLevelProduction node) {}
+  dynamic visitTopLevelProduction(TopLevelProduction node) {}
 
   @override
-  void visitDirective(Directive node) {}
+  dynamic visitDirective(Directive node) {}
 
   @override
-  void visitCalcTerm(CalcTerm node) {
+  dynamic visitCalcTerm(CalcTerm node) {
     visitLiteralTerm(node);
     visitLiteralTerm(node.expr);
   }
 
   @override
-  void visitCssComment(CssComment node) {}
+  dynamic visitCssComment(CssComment node) {}
 
   @override
-  void visitCommentDefinition(CommentDefinition node) {}
+  dynamic visitCommentDefinition(CommentDefinition node) {}
 
   @override
-  void visitMediaExpression(MediaExpression node) {
+  dynamic visitMediaExpression(MediaExpression node) {
     visitExpressions(node.exprs);
   }
 
   @override
-  void visitMediaQuery(MediaQuery node) {
+  dynamic visitMediaQuery(MediaQuery node) {
     for (var mediaExpr in node.expressions) {
       visitMediaExpression(mediaExpr);
     }
   }
 
   @override
-  void visitDocumentDirective(DocumentDirective node) {
+  dynamic visitDocumentDirective(DocumentDirective node) {
     _visitNodeList(node.functions);
     _visitNodeList(node.groupRuleBody);
   }
 
   @override
-  void visitSupportsDirective(SupportsDirective node) {
+  dynamic visitSupportsDirective(SupportsDirective node) {
     node.condition.visit(this);
     _visitNodeList(node.groupRuleBody);
   }
 
   @override
-  void visitSupportsConditionInParens(SupportsConditionInParens node) {
+  dynamic visitSupportsConditionInParens(SupportsConditionInParens node) {
     node.condition.visit(this);
   }
 
   @override
-  void visitSupportsNegation(SupportsNegation node) {
+  dynamic visitSupportsNegation(SupportsNegation node) {
     node.condition.visit(this);
   }
 
   @override
-  void visitSupportsConjunction(SupportsConjunction node) {
+  dynamic visitSupportsConjunction(SupportsConjunction node) {
     _visitNodeList(node.conditions);
   }
 
   @override
-  void visitSupportsDisjunction(SupportsDisjunction node) {
+  dynamic visitSupportsDisjunction(SupportsDisjunction node) {
     _visitNodeList(node.conditions);
   }
 
   @override
-  void visitViewportDirective(ViewportDirective node) {
+  dynamic visitViewportDirective(ViewportDirective node) {
     node.declarations.visit(this);
   }
 
   @override
-  void visitMediaDirective(MediaDirective node) {
+  dynamic visitMediaDirective(MediaDirective node) {
     _visitNodeList(node.mediaQueries);
     _visitNodeList(node.rules);
   }
 
   @override
-  void visitHostDirective(HostDirective node) {
+  dynamic visitHostDirective(HostDirective node) {
     _visitNodeList(node.rules);
   }
 
   @override
-  void visitPageDirective(PageDirective node) {
+  dynamic visitPageDirective(PageDirective node) {
     for (var declGroup in node._declsMargin) {
       if (declGroup is MarginGroup) {
         visitMarginGroup(declGroup);
@@ -226,60 +226,60 @@ class Visitor implements VisitorBase<void> {
   }
 
   @override
-  void visitCharsetDirective(CharsetDirective node) {}
+  dynamic visitCharsetDirective(CharsetDirective node) {}
 
   @override
-  void visitImportDirective(ImportDirective node) {
+  dynamic visitImportDirective(ImportDirective node) {
     for (var mediaQuery in node.mediaQueries) {
       visitMediaQuery(mediaQuery);
     }
   }
 
   @override
-  void visitKeyFrameDirective(KeyFrameDirective node) {
+  dynamic visitKeyFrameDirective(KeyFrameDirective node) {
     visitIdentifier(node.name);
     _visitNodeList(node._blocks);
   }
 
   @override
-  void visitKeyFrameBlock(KeyFrameBlock node) {
+  dynamic visitKeyFrameBlock(KeyFrameBlock node) {
     visitExpressions(node._blockSelectors);
     visitDeclarationGroup(node._declarations);
   }
 
   @override
-  void visitFontFaceDirective(FontFaceDirective node) {
+  dynamic visitFontFaceDirective(FontFaceDirective node) {
     visitDeclarationGroup(node._declarations);
   }
 
   @override
-  void visitStyletDirective(StyletDirective node) {
+  dynamic visitStyletDirective(StyletDirective node) {
     _visitNodeList(node.rules);
   }
 
   @override
-  void visitNamespaceDirective(NamespaceDirective node) {}
+  dynamic visitNamespaceDirective(NamespaceDirective node) {}
 
   @override
-  void visitVarDefinitionDirective(VarDefinitionDirective node) {
+  dynamic visitVarDefinitionDirective(VarDefinitionDirective node) {
     visitVarDefinition(node.def);
   }
 
   @override
-  void visitMixinRulesetDirective(MixinRulesetDirective node) {
+  dynamic visitMixinRulesetDirective(MixinRulesetDirective node) {
     _visitNodeList(node.rulesets);
   }
 
   @override
-  void visitMixinDefinition(MixinDefinition node) {}
+  dynamic visitMixinDefinition(MixinDefinition node) {}
 
   @override
-  void visitMixinDeclarationDirective(MixinDeclarationDirective node) {
+  dynamic visitMixinDeclarationDirective(MixinDeclarationDirective node) {
     visitDeclarationGroup(node.declarations);
   }
 
   @override
-  void visitIncludeDirective(IncludeDirective node) {
+  dynamic visitIncludeDirective(IncludeDirective node) {
     for (var index = 0; index < node.args.length; index++) {
       var param = node.args[index];
       _visitNodeList(param);
@@ -287,66 +287,66 @@ class Visitor implements VisitorBase<void> {
   }
 
   @override
-  void visitContentDirective(ContentDirective node) {
+  dynamic visitContentDirective(ContentDirective node) {
     // TODO(terry): TBD
   }
 
   @override
-  void visitRuleSet(RuleSet node) {
+  dynamic visitRuleSet(RuleSet node) {
     visitSelectorGroup(node._selectorGroup);
     visitDeclarationGroup(node._declarationGroup);
   }
 
   @override
-  void visitDeclarationGroup(DeclarationGroup node) {
+  dynamic visitDeclarationGroup(DeclarationGroup node) {
     _visitNodeList(node.declarations);
   }
 
   @override
-  void visitMarginGroup(MarginGroup node) => visitDeclarationGroup(node);
+  dynamic visitMarginGroup(MarginGroup node) => visitDeclarationGroup(node);
 
   @override
-  void visitDeclaration(Declaration node) {
+  dynamic visitDeclaration(Declaration node) {
     visitIdentifier(node._property);
     if (node._expression != null) node._expression.visit(this);
   }
 
   @override
-  void visitVarDefinition(VarDefinition node) {
+  dynamic visitVarDefinition(VarDefinition node) {
     visitIdentifier(node._property);
     if (node._expression != null) node._expression.visit(this);
   }
 
   @override
-  void visitIncludeMixinAtDeclaration(IncludeMixinAtDeclaration node) {
+  dynamic visitIncludeMixinAtDeclaration(IncludeMixinAtDeclaration node) {
     visitIncludeDirective(node.include);
   }
 
   @override
-  void visitExtendDeclaration(ExtendDeclaration node) {
+  dynamic visitExtendDeclaration(ExtendDeclaration node) {
     _visitNodeList(node.selectors);
   }
 
   @override
-  void visitSelectorGroup(SelectorGroup node) {
+  dynamic visitSelectorGroup(SelectorGroup node) {
     _visitNodeList(node.selectors);
   }
 
   @override
-  void visitSelector(Selector node) {
+  dynamic visitSelector(Selector node) {
     _visitNodeList(node.simpleSelectorSequences);
   }
 
   @override
-  void visitSimpleSelectorSequence(SimpleSelectorSequence node) {
+  dynamic visitSimpleSelectorSequence(SimpleSelectorSequence node) {
     node.simpleSelector.visit(this);
   }
 
   @override
-  void visitSimpleSelector(SimpleSelector node) => node._name.visit(this);
+  dynamic visitSimpleSelector(SimpleSelector node) => node._name.visit(this);
 
   @override
-  void visitNamespaceSelector(NamespaceSelector node) {
+  dynamic visitNamespaceSelector(NamespaceSelector node) {
     if (node._namespace != null) node._namespace.visit(this);
     if (node.nameAsSimpleSelector != null) {
       node.nameAsSimpleSelector.visit(this);
@@ -354,232 +354,232 @@ class Visitor implements VisitorBase<void> {
   }
 
   @override
-  void visitElementSelector(ElementSelector node) => visitSimpleSelector(node);
+  dynamic visitElementSelector(ElementSelector node) => visitSimpleSelector(node);
 
   @override
-  void visitAttributeSelector(AttributeSelector node) {
+  dynamic visitAttributeSelector(AttributeSelector node) {
     visitSimpleSelector(node);
   }
 
   @override
-  void visitIdSelector(IdSelector node) => visitSimpleSelector(node);
+  dynamic visitIdSelector(IdSelector node) => visitSimpleSelector(node);
 
   @override
-  void visitClassSelector(ClassSelector node) => visitSimpleSelector(node);
+  dynamic visitClassSelector(ClassSelector node) => visitSimpleSelector(node);
 
   @override
-  void visitPseudoClassSelector(PseudoClassSelector node) =>
+  dynamic visitPseudoClassSelector(PseudoClassSelector node) =>
       visitSimpleSelector(node);
 
   @override
-  void visitPseudoElementSelector(PseudoElementSelector node) =>
+  dynamic visitPseudoElementSelector(PseudoElementSelector node) =>
       visitSimpleSelector(node);
 
   @override
-  void visitPseudoClassFunctionSelector(PseudoClassFunctionSelector node) =>
+  dynamic visitPseudoClassFunctionSelector(PseudoClassFunctionSelector node) =>
       visitSimpleSelector(node);
 
   @override
-  void visitPseudoElementFunctionSelector(PseudoElementFunctionSelector node) =>
+  dynamic visitPseudoElementFunctionSelector(PseudoElementFunctionSelector node) =>
       visitSimpleSelector(node);
 
   @override
-  void visitNegationSelector(NegationSelector node) =>
+  dynamic visitNegationSelector(NegationSelector node) =>
       visitSimpleSelector(node);
 
   @override
-  void visitSelectorExpression(SelectorExpression node) {
+  dynamic visitSelectorExpression(SelectorExpression node) {
     _visitNodeList(node.expressions);
   }
 
   @override
-  void visitUnicodeRangeTerm(UnicodeRangeTerm node) {}
+  dynamic visitUnicodeRangeTerm(UnicodeRangeTerm node) {}
 
   @override
-  void visitLiteralTerm(LiteralTerm node) {}
+  dynamic visitLiteralTerm(LiteralTerm node) {}
 
   @override
-  void visitHexColorTerm(HexColorTerm node) {}
+  dynamic visitHexColorTerm(HexColorTerm node) {}
 
   @override
-  void visitNumberTerm(NumberTerm node) {}
+  dynamic visitNumberTerm(NumberTerm node) {}
 
   @override
-  void visitUnitTerm(UnitTerm node) {}
+  dynamic visitUnitTerm(UnitTerm node) {}
 
   @override
-  void visitLengthTerm(LengthTerm node) {
+  dynamic visitLengthTerm(LengthTerm node) {
     visitUnitTerm(node);
   }
 
   @override
-  void visitPercentageTerm(PercentageTerm node) {
+  dynamic visitPercentageTerm(PercentageTerm node) {
     visitLiteralTerm(node);
   }
 
   @override
-  void visitEmTerm(EmTerm node) {
+  dynamic visitEmTerm(EmTerm node) {
     visitLiteralTerm(node);
   }
 
   @override
-  void visitExTerm(ExTerm node) {
+  dynamic visitExTerm(ExTerm node) {
     visitLiteralTerm(node);
   }
 
   @override
-  void visitAngleTerm(AngleTerm node) {
+  dynamic visitAngleTerm(AngleTerm node) {
     visitUnitTerm(node);
   }
 
   @override
-  void visitTimeTerm(TimeTerm node) {
+  dynamic visitTimeTerm(TimeTerm node) {
     visitUnitTerm(node);
   }
 
   @override
-  void visitFreqTerm(FreqTerm node) {
+  dynamic visitFreqTerm(FreqTerm node) {
     visitUnitTerm(node);
   }
 
   @override
-  void visitFractionTerm(FractionTerm node) {
+  dynamic visitFractionTerm(FractionTerm node) {
     visitLiteralTerm(node);
   }
 
   @override
-  void visitUriTerm(UriTerm node) {
+  dynamic visitUriTerm(UriTerm node) {
     visitLiteralTerm(node);
   }
 
   @override
-  void visitResolutionTerm(ResolutionTerm node) {
+  dynamic visitResolutionTerm(ResolutionTerm node) {
     visitUnitTerm(node);
   }
 
   @override
-  void visitChTerm(ChTerm node) {
+  dynamic visitChTerm(ChTerm node) {
     visitUnitTerm(node);
   }
 
   @override
-  void visitRemTerm(RemTerm node) {
+  dynamic visitRemTerm(RemTerm node) {
     visitUnitTerm(node);
   }
 
   @override
-  void visitViewportTerm(ViewportTerm node) {
+  dynamic visitViewportTerm(ViewportTerm node) {
     visitUnitTerm(node);
   }
 
   @override
-  void visitFunctionTerm(FunctionTerm node) {
+  dynamic visitFunctionTerm(FunctionTerm node) {
     visitLiteralTerm(node);
     visitExpressions(node._params);
   }
 
   @override
-  void visitGroupTerm(GroupTerm node) {
+  dynamic visitGroupTerm(GroupTerm node) {
     for (var term in node._terms) {
       term.visit(this);
     }
   }
 
   @override
-  void visitItemTerm(ItemTerm node) {
+  dynamic visitItemTerm(ItemTerm node) {
     visitNumberTerm(node);
   }
 
   @override
-  void visitIE8Term(IE8Term node) {}
+  dynamic visitIE8Term(IE8Term node) {}
 
   @override
-  void visitOperatorSlash(OperatorSlash node) {}
+  dynamic visitOperatorSlash(OperatorSlash node) {}
 
   @override
-  void visitOperatorComma(OperatorComma node) {}
+  dynamic visitOperatorComma(OperatorComma node) {}
 
   @override
-  void visitOperatorPlus(OperatorPlus node) {}
+  dynamic visitOperatorPlus(OperatorPlus node) {}
 
   @override
-  void visitOperatorMinus(OperatorMinus node) {}
+  dynamic visitOperatorMinus(OperatorMinus node) {}
 
   @override
-  void visitVarUsage(VarUsage node) {
+  dynamic visitVarUsage(VarUsage node) {
     _visitNodeList(node.defaultValues);
   }
 
   @override
-  void visitExpressions(Expressions node) {
+  dynamic visitExpressions(Expressions node) {
     _visitNodeList(node.expressions);
   }
 
   @override
-  void visitBinaryExpression(BinaryExpression node) {
+  dynamic visitBinaryExpression(BinaryExpression node) {
     // TODO(terry): TBD
     throw UnimplementedError();
   }
 
   @override
-  void visitUnaryExpression(UnaryExpression node) {
+  dynamic visitUnaryExpression(UnaryExpression node) {
     // TODO(terry): TBD
     throw UnimplementedError();
   }
 
   @override
-  void visitIdentifier(Identifier node) {}
+  dynamic visitIdentifier(Identifier node) {}
 
   @override
-  void visitWildcard(Wildcard node) {}
+  dynamic visitWildcard(Wildcard node) {}
 
   @override
-  void visitThisOperator(ThisOperator node) {}
+  dynamic visitThisOperator(ThisOperator node) {}
 
   @override
-  void visitNegation(Negation node) {}
+  dynamic visitNegation(Negation node) {}
 
   @override
-  void visitDartStyleExpression(DartStyleExpression node) {}
+  dynamic visitDartStyleExpression(DartStyleExpression node) {}
 
   @override
-  void visitFontExpression(FontExpression node) {
+  dynamic visitFontExpression(FontExpression node) {
     // TODO(terry): TBD
     throw UnimplementedError();
   }
 
   @override
-  void visitBoxExpression(BoxExpression node) {
+  dynamic visitBoxExpression(BoxExpression node) {
     // TODO(terry): TBD
     throw UnimplementedError();
   }
 
   @override
-  void visitMarginExpression(MarginExpression node) {
+  dynamic visitMarginExpression(MarginExpression node) {
     // TODO(terry): TBD
     throw UnimplementedError();
   }
 
   @override
-  void visitBorderExpression(BorderExpression node) {
+  dynamic visitBorderExpression(BorderExpression node) {
     // TODO(terry): TBD
     throw UnimplementedError();
   }
 
   @override
-  void visitHeightExpression(HeightExpression node) {
+  dynamic visitHeightExpression(HeightExpression node) {
     // TODO(terry): TB
     throw UnimplementedError();
   }
 
   @override
-  void visitPaddingExpression(PaddingExpression node) {
+  dynamic visitPaddingExpression(PaddingExpression node) {
     // TODO(terry): TBD
     throw UnimplementedError();
   }
 
   @override
-  void visitWidthExpression(WidthExpression node) {
+  dynamic visitWidthExpression(WidthExpression node) {
     // TODO(terry): TBD
     throw UnimplementedError();
   }

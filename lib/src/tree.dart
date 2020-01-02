@@ -161,7 +161,8 @@ class SimpleSelectorSequence extends TreeNode {
       SimpleSelectorSequence(simpleSelector, span, combinator);
 
   @override
-  dynamic visit(VisitorBase visitor) => visitor.visitSimpleSelectorSequence(this);
+  dynamic visit(VisitorBase visitor) =>
+      visitor.visitSimpleSelectorSequence(this);
 
   @override
   String toString() => simpleSelector.name;
@@ -338,7 +339,8 @@ class PseudoElementSelector extends SimpleSelector {
       {this.isLegacy = false})
       : super(name, span);
   @override
-  dynamic visit(VisitorBase visitor) => visitor.visitPseudoElementSelector(this);
+  dynamic visit(VisitorBase visitor) =>
+      visitor.visitPseudoElementSelector(this);
 
   @override
   PseudoElementSelector clone() => PseudoElementSelector(_name, span);
@@ -902,7 +904,8 @@ class VarDefinitionDirective extends Directive {
   VarDefinitionDirective clone() => VarDefinitionDirective(def.clone(), span);
 
   @override
-  dynamic visit(VisitorBase visitor) => visitor.visitVarDefinitionDirective(this);
+  dynamic visit(VisitorBase visitor) =>
+      visitor.visitVarDefinitionDirective(this);
 }
 
 class MixinDefinition extends Directive {
@@ -949,7 +952,8 @@ class MixinRulesetDirective extends MixinDefinition {
   }
 
   @override
-  dynamic visit(VisitorBase visitor) => visitor.visitMixinRulesetDirective(this);
+  dynamic visit(VisitorBase visitor) =>
+      visitor.visitMixinRulesetDirective(this);
 }
 
 class MixinDeclarationDirective extends MixinDefinition {

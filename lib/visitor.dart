@@ -63,7 +63,8 @@ abstract class VisitorBase {
   dynamic visitPseudoClassSelector(PseudoClassSelector node);
   dynamic visitPseudoElementSelector(PseudoElementSelector node);
   dynamic visitPseudoClassFunctionSelector(PseudoClassFunctionSelector node);
-  dynamic visitPseudoElementFunctionSelector(PseudoElementFunctionSelector node);
+  dynamic visitPseudoElementFunctionSelector(
+      PseudoElementFunctionSelector node);
   dynamic visitNegationSelector(NegationSelector node);
   dynamic visitSelectorExpression(SelectorExpression node);
 
@@ -354,7 +355,8 @@ class Visitor implements VisitorBase {
   }
 
   @override
-  dynamic visitElementSelector(ElementSelector node) => visitSimpleSelector(node);
+  dynamic visitElementSelector(ElementSelector node) =>
+      visitSimpleSelector(node);
 
   @override
   dynamic visitAttributeSelector(AttributeSelector node) {
@@ -380,7 +382,8 @@ class Visitor implements VisitorBase {
       visitSimpleSelector(node);
 
   @override
-  dynamic visitPseudoElementFunctionSelector(PseudoElementFunctionSelector node) =>
+  dynamic visitPseudoElementFunctionSelector(
+          PseudoElementFunctionSelector node) =>
       visitSimpleSelector(node);
 
   @override

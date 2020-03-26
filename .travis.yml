@@ -10,9 +10,11 @@ dart_task:
 matrix:
   include:
     - dart: dev
-      dartanalyzer: --fatal-infos --fatal-warnings .
+      dart_task:
+        dartanalyzer: --fatal-infos --fatal-warnings .
     - dart: 2.2.0
-      dartanalyzer: --fatal-warnings .
+      dart_task:
+        dartanalyzer: --fatal-warnings .
     - dart: dev
       dart_task: dartfmt
 

@@ -275,7 +275,7 @@ class Color implements _StyleProperty, ColorBase {
 
   static int hexToInt(String hex) => int.parse(hex, radix: 16);
 
-  static String convertToHexString(int r, int g, int b, [num a]) {
+  static String convertToHexString(num r, num g, num b, [num a]) {
     var rHex = Color._numAs2DigitHex(Color._clamp(r, 0, 255));
     var gHex = Color._numAs2DigitHex(Color._clamp(g, 0, 255));
     var bHex = Color._numAs2DigitHex(Color._clamp(b, 0, 255));

@@ -25,7 +25,6 @@ error on line 1, column 24: Unknown property value bolder
 1 │ .foobar { font-weight: bolder; }
   │                        ^^^^^^
   ╵''');
-  expect(stylesheet != null, true);
 
   expect(prettyPrint(stylesheet), r'''
 .foobar {
@@ -44,7 +43,6 @@ error on line 1, column 24: Unknown property value lighter
 1 │ .foobar { font-weight: lighter; }
   │                        ^^^^^^^
   ╵''');
-  expect(stylesheet != null, true);
   expect(prettyPrint(stylesheet), r'''
 .foobar {
   font-weight: lighter;
@@ -62,7 +60,6 @@ error on line 1, column 24: Unknown property value inherit
 1 │ .foobar { font-weight: inherit; }
   │                        ^^^^^^^
   ╵''');
-  expect(stylesheet != null, true);
   expect(prettyPrint(stylesheet), r'''
 .foobar {
   font-weight: inherit;
@@ -85,7 +82,6 @@ error on line 1, column 24: Unexpected value for line-height
 1 │ .foobar { line-height: 120%; }
   │                        ^^^
   ╵''');
-  expect(stylesheet != null, true);
   expect(prettyPrint(stylesheet), r'''
 .foobar {
   line-height: 120%;
@@ -103,7 +99,6 @@ error on line 1, column 24: Unexpected unit for line-height
 1 │ .foobar { line-height: 20cm; }
   │                        ^^
   ╵''');
-  expect(stylesheet != null, true);
   expect(prettyPrint(stylesheet), r'''
 .foobar {
   line-height: 20cm;
@@ -121,7 +116,6 @@ error on line 1, column 24: Unknown property value inherit
 1 │ .foobar { line-height: inherit; }
   │                        ^^^^^^^
   ╵''');
-  expect(stylesheet != null, true);
   expect(prettyPrint(stylesheet), r'''
 .foobar {
   line-height: inherit;
@@ -172,7 +166,6 @@ error on line 1, column 18: Bad hex number
 1 │ .foobar { color: #AH787; }
   │                  ^^^^^^
   ╵''');
-  expect(stylesheet != null, true);
   expect(prettyPrint(stylesheet), r'''
 .foobar {
   color: #AH787;
@@ -190,7 +183,6 @@ error on line 1, column 18: Unknown property value redder
   │                  ^^^^^^
   ╵''');
 
-  expect(stylesheet != null, true);
   expect(prettyPrint(stylesheet), r'''
 .foobar {
   color: redder;
@@ -208,7 +200,6 @@ error on line 1, column 18: Expected hex number
   │                  ^
   ╵''');
 
-  expect(stylesheet != null, true);
   expect(prettyPrint(stylesheet), r'''
 .foobar {
   color: # ffffff;
@@ -225,8 +216,6 @@ error on line 1, column 18: Expected hex number
 1 │ .foobar { color: # 123fff; }
   │                  ^
   ╵''');
-
-  expect(stylesheet != null, true);
 
   // Formating is off with an extra space.  However, the entire value is bad
   // and isn't processed anyway.
@@ -291,12 +280,12 @@ div {
 
   parseCss(input, errors: errors);
   expect(errors.length, 1);
-  var errorMessage = messages.messages[0];
+  var errorMessage = messages!.messages[0];
   expect(errorMessage.message, contains('Bad hex number'));
   expect(errorMessage.span, isNotNull);
-  expect(errorMessage.span.start.line, 4);
-  expect(errorMessage.span.start.column, 11);
-  expect(errorMessage.span.text, '#ffghghgh');
+  expect(errorMessage.span!.start.line, 4);
+  expect(errorMessage.span!.start.column, 11);
+  expect(errorMessage.span!.text, '#ffghghgh');
 
   // Test for bad selector syntax.
   final input2 = '''
@@ -308,33 +297,33 @@ div {
 ''';
   parseCss(input2, errors: errors..clear());
   expect(errors.length, 4);
-  errorMessage = messages.messages[0];
+  errorMessage = messages!.messages[0];
   expect(errorMessage.message, contains(':, but found +'));
   expect(errorMessage.span, isNotNull);
-  expect(errorMessage.span.start.line, 1);
-  expect(errorMessage.span.start.column, 7);
-  expect(errorMessage.span.text, '+');
+  expect(errorMessage.span!.start.line, 1);
+  expect(errorMessage.span!.start.column, 7);
+  expect(errorMessage.span!.text, '+');
 
-  errorMessage = messages.messages[1];
+  errorMessage = messages!.messages[1];
   expect(errorMessage.message, contains('Unknown property value ul'));
   expect(errorMessage.span, isNotNull);
-  expect(errorMessage.span.start.line, 1);
-  expect(errorMessage.span.start.column, 9);
-  expect(errorMessage.span.text, 'ul');
+  expect(errorMessage.span!.start.line, 1);
+  expect(errorMessage.span!.start.column, 9);
+  expect(errorMessage.span!.text, 'ul');
 
-  errorMessage = messages.messages[2];
+  errorMessage = messages!.messages[2];
   expect(errorMessage.message, contains('expected }, but found >'));
   expect(errorMessage.span, isNotNull);
-  expect(errorMessage.span.start.line, 1);
-  expect(errorMessage.span.start.column, 18);
-  expect(errorMessage.span.text, '>');
+  expect(errorMessage.span!.start.line, 1);
+  expect(errorMessage.span!.start.column, 18);
+  expect(errorMessage.span!.text, '>');
 
-  errorMessage = messages.messages[3];
+  errorMessage = messages!.messages[3];
   expect(errorMessage.message, contains('premature end of file unknown CSS'));
   expect(errorMessage.span, isNotNull);
-  expect(errorMessage.span.start.line, 1);
-  expect(errorMessage.span.start.column, 20);
-  expect(errorMessage.span.text, '(');
+  expect(errorMessage.span!.start.line, 1);
+  expect(errorMessage.span!.start.column, 20);
+  expect(errorMessage.span!.text, '(');
 
   // Test for missing close braces and bad declaration.
   final input3 = '''
@@ -345,19 +334,19 @@ div {
 ''';
   parseCss(input3, errors: errors..clear());
   expect(errors.length, 2);
-  errorMessage = messages.messages[0];
+  errorMessage = messages!.messages[0];
   expect(errorMessage.message, contains('Bad hex number'));
   expect(errorMessage.span, isNotNull);
-  expect(errorMessage.span.start.line, 2);
-  expect(errorMessage.span.start.column, 11);
-  expect(errorMessage.span.text, '#green');
+  expect(errorMessage.span!.start.line, 2);
+  expect(errorMessage.span!.start.column, 11);
+  expect(errorMessage.span!.text, '#green');
 
-  errorMessage = messages.messages[1];
+  errorMessage = messages!.messages[1];
   expect(errorMessage.message, contains('expected }, but found end of file'));
   expect(errorMessage.span, isNotNull);
-  expect(errorMessage.span.start.line, 3);
-  expect(errorMessage.span.start.column, 1);
-  expect(errorMessage.span.text, '\n');
+  expect(errorMessage.span!.start.line, 3);
+  expect(errorMessage.span!.start.column, 1);
+  expect(errorMessage.span!.text, '\n');
 }
 
 void main() {

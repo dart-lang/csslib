@@ -12,7 +12,6 @@ import 'testing.dart';
 void compileAndValidate(String input, String generated) {
   var errors = <Message>[];
   var stylesheet = compileCss(input, errors: errors, opts: options);
-  expect(stylesheet != null, true);
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(stylesheet), generated);
 }
@@ -20,7 +19,6 @@ void compileAndValidate(String input, String generated) {
 void compilePolyfillAndValidate(String input, String generated) {
   var errors = <Message>[];
   var stylesheet = polyFillCompileCss(input, errors: errors, opts: options);
-  expect(stylesheet != null, true);
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(stylesheet), generated);
 }
@@ -476,7 +474,6 @@ void undefinedVars() {
   var stylesheet =
       polyFillCompileCss(input, errors: errors..clear(), opts: options);
 
-  expect(stylesheet != null, true);
 
   expect(errors.length, errorStrings.length, reason: errors.toString());
   testBitMap = 0;
@@ -678,7 +675,6 @@ var-color-foreground: #00f;
 
   var stylesheet = parseCss(input, errors: errors, opts: simpleOptions);
 
-  expect(stylesheet != null, true);
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(stylesheet), generated);
 
@@ -704,7 +700,6 @@ var-color-foreground: #00f;
 
   stylesheet = parseCss(input, errors: errors..clear(), opts: simpleOptions);
 
-  expect(stylesheet != null, true);
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(stylesheet), generated2);
 
@@ -733,7 +728,6 @@ var-color-foreground: #00f;
 
   var stylesheet = parseCss(input, errors: errors, opts: simpleOptions);
 
-  expect(stylesheet != null, true);
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(stylesheet), generated);
 
@@ -759,7 +753,6 @@ var-color-foreground: #00f;
 
   stylesheet = parseCss(input, errors: errors..clear(), opts: simpleOptions);
 
-  expect(stylesheet != null, true);
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(stylesheet), generated2);
 
@@ -874,7 +867,6 @@ void includes() {
 }''';
 
   var stylesheet1 = compileCss(file1Input, errors: errors, opts: options);
-  expect(stylesheet1 != null, true);
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(stylesheet1), generated1);
 
@@ -891,7 +883,6 @@ void includes() {
 
   var stylesheet2 = compileCss(file2Input,
       includes: [stylesheet1], errors: errors..clear(), opts: options);
-  expect(stylesheet2 != null, true);
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(stylesheet2), generated2);
 
@@ -908,7 +899,6 @@ void includes() {
 }''';
   var styleSheet1Polyfill = compileCss(file1Input,
       errors: errors..clear(), polyfill: true, opts: options);
-  expect(styleSheet1Polyfill != null, true);
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(styleSheet1Polyfill), generatedPolyfill1);
 
@@ -925,7 +915,6 @@ void includes() {
       errors: errors..clear(),
       polyfill: true,
       opts: options);
-  expect(styleSheet2Polyfill != null, true);
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(styleSheet2Polyfill), generatedPolyfill2);
 
@@ -946,7 +935,6 @@ void includes() {
       polyfill: true,
       opts: options);
 
-  expect(stylesheetPolyfill != null, true);
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(stylesheetPolyfill), generatedPolyfill);
 

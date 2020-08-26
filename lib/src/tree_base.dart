@@ -7,7 +7,7 @@ part of '../visitor.dart';
 /// The base type for all nodes in a CSS abstract syntax tree.
 abstract class TreeNode {
   /// The source code this [TreeNode] represents.
-  final SourceSpan span;
+  final SourceSpan? span;
 
   TreeNode(this.span);
 
@@ -28,13 +28,17 @@ abstract class TreeNode {
 /// The base type for expressions.
 abstract class Expression extends TreeNode {
   Expression(SourceSpan span) : super(span);
+  @override
+  Expression clone();
+  @override
+  SourceSpan get span => super.span!;
 }
 
 /// Simple class to provide a textual dump of trees for debugging.
 class TreeOutput {
   int depth = 0;
   final StringBuffer buf = StringBuffer();
-  VisitorBase printer;
+  VisitorBase? printer;
 
   void write(String s) {
     for (var i = 0; i < depth; i++) {
@@ -66,11 +70,11 @@ class TreeOutput {
     }
   }
 
-  void writeNode(String label, TreeNode node) {
+  void writeNode(String label, TreeNode? node) {
     write('${label}: ');
     depth += 1;
     if (node != null) {
-      node.visit(printer);
+      node.visit(printer!);
     } else {
       writeln('null');
     }
@@ -82,16 +86,12 @@ class TreeOutput {
     writeln('${label}: ${v}');
   }
 
-  void writeNodeList(String label, List<TreeNode> list) {
+  void writeNodeList(String label, List<TreeNode>? list) {
     writeln('${label} [');
     if (list != null) {
       depth += 1;
       for (var node in list) {
-        if (node != null) {
-          node.visit(printer);
-        } else {
-          writeln('null');
-        }
+        node.visit(printer!);
       }
       depth -= 1;
       writeln(']');

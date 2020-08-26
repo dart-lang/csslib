@@ -14,6 +14,9 @@ class Identifier extends TreeNode {
   Identifier(this.name, SourceSpan span) : super(span);
 
   @override
+  SourceSpan get span => super.span!;
+
+  @override
   Identifier clone() => Identifier(name, span);
 
   @override
@@ -24,12 +27,14 @@ class Identifier extends TreeNode {
     // Try to use the identifier's original lexeme to preserve any escape codes
     // as authored. The name, which may include escaped values, may no longer be
     // a valid identifier.
-    return span?.text ?? name;
+    return span.text;
   }
 }
 
 class Wildcard extends TreeNode {
   Wildcard(SourceSpan span) : super(span);
+  @override
+  SourceSpan get span => super.span!;
   @override
   Wildcard clone() => Wildcard(span);
   @override
@@ -41,6 +46,8 @@ class Wildcard extends TreeNode {
 class ThisOperator extends TreeNode {
   ThisOperator(SourceSpan span) : super(span);
   @override
+  SourceSpan get span => super.span!;
+  @override
   ThisOperator clone() => ThisOperator(span);
   @override
   dynamic visit(VisitorBase visitor) => visitor.visitThisOperator(this);
@@ -50,6 +57,8 @@ class ThisOperator extends TreeNode {
 
 class Negation extends TreeNode {
   Negation(SourceSpan span) : super(span);
+  @override
+  SourceSpan get span => super.span!;
   @override
   Negation clone() => Negation(span);
   @override
@@ -82,6 +91,8 @@ class CssComment extends TreeNode {
 
   CssComment(this.comment, SourceSpan span) : super(span);
   @override
+  SourceSpan get span => super.span!;
+  @override
   CssComment clone() => CssComment(comment, span);
   @override
   dynamic visit(VisitorBase visitor) => visitor.visitCssComment(this);
@@ -102,6 +113,9 @@ class SelectorGroup extends TreeNode {
   SelectorGroup(this.selectors, SourceSpan span) : super(span);
 
   @override
+  SourceSpan get span => super.span!;
+
+  @override
   SelectorGroup clone() => SelectorGroup(selectors, span);
 
   @override
@@ -116,6 +130,9 @@ class Selector extends TreeNode {
   void add(SimpleSelectorSequence seq) => simpleSelectorSequences.add(seq);
 
   int get length => simpleSelectorSequences.length;
+
+  @override
+  SourceSpan get span => super.span!;
 
   @override
   Selector clone() {
@@ -162,6 +179,9 @@ class SimpleSelectorSequence extends TreeNode {
   }
 
   @override
+  SourceSpan get span => super.span!;
+
+  @override
   SimpleSelectorSequence clone() =>
       SimpleSelectorSequence(simpleSelector, span, combinator);
 
@@ -185,6 +205,9 @@ abstract class SimpleSelector extends TreeNode {
   bool get isWildcard => _name is Wildcard;
 
   bool get isThis => _name is ThisOperator;
+
+  @override
+  SourceSpan get span => super.span!;
 
   @override
   dynamic visit(VisitorBase visitor) => visitor.visitSimpleSelector(this);
@@ -215,7 +238,7 @@ class NamespaceSelector extends SimpleSelector {
 
   bool get isNamespaceWildcard => _namespace is Wildcard;
 
-  SimpleSelector get nameAsSimpleSelector => _name;
+  SimpleSelector? get nameAsSimpleSelector => _name;
 
   @override
   NamespaceSelector clone() => NamespaceSelector(_namespace, '', span);
@@ -224,7 +247,7 @@ class NamespaceSelector extends SimpleSelector {
   dynamic visit(VisitorBase visitor) => visitor.visitNamespaceSelector(this);
 
   @override
-  String toString() => '$namespace|${nameAsSimpleSelector.name}';
+  String toString() => '$namespace|${nameAsSimpleSelector!.name}';
 }
 
 // [attr op value]
@@ -237,7 +260,7 @@ class AttributeSelector extends SimpleSelector {
 
   int get operatorKind => _op;
 
-  String matchOperator() {
+  String? matchOperator() {
     switch (_op) {
       case TokenKind.EQUALS:
         return '=';
@@ -258,7 +281,7 @@ class AttributeSelector extends SimpleSelector {
   }
 
   // Return the TokenKind for operator used by visitAttributeSelector.
-  String matchOperatorAsTokenString() {
+  String? matchOperatorAsTokenString() {
     switch (_op) {
       case TokenKind.EQUALS:
         return 'EQUALS';
@@ -396,6 +419,9 @@ class SelectorExpression extends TreeNode {
   SelectorExpression(this.expressions, SourceSpan span) : super(span);
 
   @override
+  SourceSpan get span => super.span!;
+
+  @override
   SelectorExpression clone() {
     return SelectorExpression(expressions.map((e) => e.clone()).toList(), span);
   }
@@ -406,7 +432,7 @@ class SelectorExpression extends TreeNode {
 
 // :NOT(negation_arg)
 class NegationSelector extends SimpleSelector {
-  final SimpleSelector negationArg;
+  final SimpleSelector? negationArg;
 
   NegationSelector(this.negationArg, SourceSpan span)
       : super(Negation(span), span);
@@ -442,6 +468,9 @@ class StyleSheet extends TreeNode {
   StyleSheet.selector(this.topLevels, SourceSpan span) : super(span);
 
   @override
+  SourceSpan get span => super.span!;
+
+  @override
   StyleSheet clone() {
     var clonedTopLevels = topLevels.map((e) => e.clone()).toList();
     return StyleSheet(clonedTopLevels, span);
@@ -454,13 +483,15 @@ class StyleSheet extends TreeNode {
 class TopLevelProduction extends TreeNode {
   TopLevelProduction(SourceSpan span) : super(span);
   @override
+  SourceSpan get span => super.span!;
+  @override
   TopLevelProduction clone() => TopLevelProduction(span);
   @override
   dynamic visit(VisitorBase visitor) => visitor.visitTopLevelProduction(this);
 }
 
 class RuleSet extends TopLevelProduction {
-  final SelectorGroup selectorGroup;
+  final SelectorGroup? selectorGroup;
   final DeclarationGroup declarationGroup;
 
   RuleSet(this.selectorGroup, this.declarationGroup, SourceSpan span)
@@ -468,7 +499,7 @@ class RuleSet extends TopLevelProduction {
 
   @override
   RuleSet clone() {
-    var cloneSelectorGroup = selectorGroup.clone();
+    var cloneSelectorGroup = selectorGroup!.clone();
     var cloneDeclarationGroup = declarationGroup.clone();
     return RuleSet(cloneSelectorGroup, cloneDeclarationGroup, span);
   }
@@ -482,6 +513,9 @@ class Directive extends TreeNode {
 
   bool get isBuiltIn => true; // Known CSS directive?
   bool get isExtension => false; // SCSS extension?
+
+  @override
+  SourceSpan get span => super.span!;
 
   @override
   Directive clone() => Directive(span);
@@ -514,7 +548,7 @@ class DocumentDirective extends Directive {
 }
 
 class SupportsDirective extends Directive {
-  final SupportsCondition condition;
+  final SupportsCondition? condition;
   final List<TreeNode> groupRuleBody;
 
   SupportsDirective(this.condition, this.groupRuleBody, SourceSpan span)
@@ -522,7 +556,7 @@ class SupportsDirective extends Directive {
 
   @override
   SupportsDirective clone() {
-    var clonedCondition = condition.clone();
+    var clonedCondition = condition!.clone() as SupportsCondition;
     var clonedGroupRuleBody = <TreeNode>[];
     for (var rule in groupRuleBody) {
       clonedGroupRuleBody.add(rule.clone());
@@ -536,13 +570,15 @@ class SupportsDirective extends Directive {
 
 abstract class SupportsCondition extends TreeNode {
   SupportsCondition(SourceSpan span) : super(span);
+  @override
+  SourceSpan get span => super.span!;
 }
 
 class SupportsConditionInParens extends SupportsCondition {
   /// A [Declaration] or nested [SupportsCondition].
-  final TreeNode condition;
+  final TreeNode? condition;
 
-  SupportsConditionInParens(Declaration declaration, SourceSpan span)
+  SupportsConditionInParens(Declaration? declaration, SourceSpan span)
       : condition = declaration,
         super(span);
 
@@ -552,7 +588,7 @@ class SupportsConditionInParens extends SupportsCondition {
 
   @override
   SupportsConditionInParens clone() =>
-      SupportsConditionInParens(condition.clone(), span);
+      SupportsConditionInParens(condition!.clone() as Declaration, span);
 
   @override
   dynamic visit(VisitorBase visitor) =>
@@ -660,6 +696,9 @@ class MediaExpression extends TreeNode {
   String get mediaFeature => _mediaFeature.name;
 
   @override
+  SourceSpan get span => super.span!;
+
+  @override
   MediaExpression clone() {
     var clonedExprs = exprs.clone();
     return MediaExpression(andOperator, _mediaFeature, clonedExprs, span);
@@ -682,7 +721,7 @@ class MediaExpression extends TreeNode {
 class MediaQuery extends TreeNode {
   /// not, only or no operator.
   final int _mediaUnary;
-  final Identifier _mediaType;
+  final Identifier? _mediaType;
   final List<MediaExpression> expressions;
 
   MediaQuery(
@@ -690,11 +729,15 @@ class MediaQuery extends TreeNode {
       : super(span);
 
   bool get hasMediaType => _mediaType != null;
-  String get mediaType => _mediaType.name;
+  String get mediaType => _mediaType!.name;
 
   bool get hasUnary => _mediaUnary != -1;
   String get unary =>
-      TokenKind.idToValue(TokenKind.MEDIA_OPERATORS, _mediaUnary).toUpperCase();
+      TokenKind.idToValue(TokenKind.MEDIA_OPERATORS, _mediaUnary)!
+          .toUpperCase();
+
+  @override
+  SourceSpan get span => super.span!;
 
   @override
   MediaQuery clone() {
@@ -751,8 +794,8 @@ class HostDirective extends Directive {
 }
 
 class PageDirective extends Directive {
-  final String _ident;
-  final String _pseudoPage;
+  final String? _ident;
+  final String? _pseudoPage;
   final List<DeclarationGroup> _declsMargin;
 
   PageDirective(
@@ -771,8 +814,8 @@ class PageDirective extends Directive {
   @override
   dynamic visit(VisitorBase visitor) => visitor.visitPageDirective(this);
 
-  bool get hasIdent => _ident != null && _ident.isNotEmpty;
-  bool get hasPseudoPage => _pseudoPage != null && _pseudoPage.isNotEmpty;
+  bool get hasIdent => _ident?.isNotEmpty ?? false;
+  bool get hasPseudoPage => _pseudoPage?.isNotEmpty ?? false;
 }
 
 class CharsetDirective extends Directive {
@@ -788,7 +831,7 @@ class CharsetDirective extends Directive {
 class KeyFrameDirective extends Directive {
   // Either @keyframe or keyframe prefixed with @-webkit-, @-moz-, @-ms-, @-o-.
   final int _keyframeName;
-  final Identifier name;
+  final Identifier? name;
   final List<KeyFrameBlock> _blocks;
 
   KeyFrameDirective(this._keyframeName, this.name, SourceSpan span)
@@ -799,7 +842,7 @@ class KeyFrameDirective extends Directive {
     _blocks.add(block);
   }
 
-  String get keyFrameName {
+  String? get keyFrameName {
     switch (_keyframeName) {
       case TokenKind.DIRECTIVE_KEYFRAMES:
       case TokenKind.DIRECTIVE_MS_KEYFRAMES:
@@ -816,7 +859,7 @@ class KeyFrameDirective extends Directive {
 
   @override
   KeyFrameDirective clone() {
-    var directive = KeyFrameDirective(_keyframeName, name.clone(), span);
+    var directive = KeyFrameDirective(_keyframeName, name!.clone(), span);
     for (var block in _blocks) {
       directive.add(block.clone());
     }
@@ -882,7 +925,7 @@ class NamespaceDirective extends Directive {
   final String _prefix;
 
   /// URI associated with this namespace.
-  final String _uri;
+  final String? _uri;
 
   NamespaceDirective(this._prefix, this._uri, SourceSpan span) : super(span);
 
@@ -942,7 +985,7 @@ class MixinRulesetDirective extends MixinDefinition {
   MixinRulesetDirective clone() {
     var clonedArgs = <VarDefinition>[];
     for (var arg in definedArgs) {
-      clonedArgs.add(arg.clone());
+      clonedArgs.add(arg.clone() as VarDefinition);
     }
     var clonedRulesets = <TreeNode>[];
     for (var ruleset in rulesets) {
@@ -1008,11 +1051,11 @@ class ContentDirective extends Directive {
 }
 
 class Declaration extends TreeNode {
-  final Identifier _property;
-  final Expression expression;
+  final Identifier? _property;
+  final Expression? expression;
 
   /// Style exposed to Dart.
-  DartStyleExpression dartStyle;
+  DartStyleExpression? dartStyle;
   final bool important;
 
   /// IE CSS hacks that can only be read by a particular IE version.
@@ -1029,13 +1072,16 @@ class Declaration extends TreeNode {
       : isIE7 = ie7,
         super(span);
 
-  String get property => isIE7 ? '*${_property.name}' : _property.name;
+  String get property => isIE7 ? '*${_property!.name}' : _property!.name;
 
   bool get hasDartStyle => dartStyle != null;
 
   @override
+  SourceSpan get span => super.span!;
+
+  @override
   Declaration clone() =>
-      Declaration(_property.clone(), expression.clone(), dartStyle, span,
+      Declaration(_property!.clone(), expression!.clone(), dartStyle, span,
           important: important);
 
   @override
@@ -1051,14 +1097,14 @@ class Declaration extends TreeNode {
 class VarDefinition extends Declaration {
   bool badUsage = false;
 
-  VarDefinition(Identifier definedName, Expression expr, SourceSpan span)
+  VarDefinition(Identifier? definedName, Expression? expr, SourceSpan span)
       : super(definedName, expr, null, span);
 
-  String get definedName => _property.name;
+  String get definedName => _property!.name;
 
   @override
-  VarDefinition clone() => VarDefinition(
-      _property.clone(), expression != null ? expression.clone() : null, span);
+  VarDefinition clone() =>
+      VarDefinition(_property!.clone(), expression?.clone(), span);
 
   @override
   dynamic visit(VisitorBase visitor) => visitor.visitVarDefinition(this);
@@ -1106,6 +1152,9 @@ class DeclarationGroup extends TreeNode {
   final List<TreeNode> declarations;
 
   DeclarationGroup(this.declarations, SourceSpan span) : super(span);
+
+  @override
+  SourceSpan get span => super.span!;
 
   @override
   DeclarationGroup clone() {
@@ -1181,8 +1230,8 @@ class OperatorMinus extends Expression {
 }
 
 class UnicodeRangeTerm extends Expression {
-  final String first;
-  final String second;
+  final String? first;
+  final String? second;
 
   UnicodeRangeTerm(this.first, this.second, SourceSpan span) : super(span);
 
@@ -1513,15 +1562,15 @@ abstract class DartStyleExpression extends TreeNode {
   static const int heightStyle = 5;
   static const int widthStyle = 6;
 
-  final int _styleType;
-  int priority;
+  final int? _styleType;
+  int? priority;
 
   DartStyleExpression(this._styleType, SourceSpan span) : super(span);
 
   // Merges give 2 DartStyleExpression (or derived from DartStyleExpression,
   // e.g., FontExpression, etc.) will merge if the two expressions are of the
   // same property name (implies same exact type e.g, FontExpression).
-  DartStyleExpression merged(DartStyleExpression newDartExpr);
+  DartStyleExpression? merged(DartStyleExpression newDartExpr);
 
   bool get isUnknown => _styleType == 0 || _styleType == null;
   bool get isFont => _styleType == fontStyle;
@@ -1535,6 +1584,9 @@ abstract class DartStyleExpression extends TreeNode {
   bool isSame(DartStyleExpression other) => _styleType == other._styleType;
 
   @override
+  SourceSpan get span => super.span!;
+
+  @override
   dynamic visit(VisitorBase visitor) => visitor.visitDartStyleExpression(this);
 }
 
@@ -1545,12 +1597,12 @@ class FontExpression extends DartStyleExpression {
   // TODO(terry): Only px/pt for now need to handle all possible units to
   //              support calc expressions on units.
   FontExpression(SourceSpan span,
-      {Object /* LengthTerm | num */ size,
-      List<String> family,
-      int weight,
-      String style,
-      String variant,
-      LineHeight lineHeight})
+      {Object? /* LengthTerm | num */ size,
+      List<String>? family,
+      int? weight,
+      String? style,
+      String? variant,
+      LineHeight? lineHeight})
       : font = Font(
             size: size is LengthTerm ? size.value : size as num,
             family: family,
@@ -1561,7 +1613,7 @@ class FontExpression extends DartStyleExpression {
         super(DartStyleExpression.fontStyle, span);
 
   @override
-  FontExpression merged(DartStyleExpression newFontExpr) {
+  FontExpression? merged(DartStyleExpression newFontExpr) {
     if (newFontExpr is FontExpression && isFont && newFontExpr.isFont) {
       return FontExpression.merge(this, newFontExpr);
     }
@@ -1574,7 +1626,7 @@ class FontExpression extends DartStyleExpression {
   }
 
   FontExpression._merge(FontExpression x, FontExpression y, SourceSpan span)
-      : font = Font.merge(x.font, y.font),
+      : font = Font.merge(x.font, y.font)!,
         super(DartStyleExpression.fontStyle, span);
 
   @override
@@ -1591,22 +1643,24 @@ class FontExpression extends DartStyleExpression {
 }
 
 abstract class BoxExpression extends DartStyleExpression {
-  final BoxEdge box;
+  final BoxEdge? box;
 
-  BoxExpression(int styleType, SourceSpan span, this.box)
+  BoxExpression(int? styleType, SourceSpan span, this.box)
       : super(styleType, span);
 
   @override
   dynamic visit(VisitorBase visitor) => visitor.visitBoxExpression(this);
 
   String get formattedBoxEdge {
-    if (box.top == box.left && box.top == box.bottom && box.top == box.right) {
-      return '.uniform(${box.top})';
+    if (box!.top == box!.left &&
+        box!.top == box!.bottom &&
+        box!.top == box!.right) {
+      return '.uniform(${box!.top})';
     } else {
-      var left = box.left ?? 0;
-      var top = box.top ?? 0;
-      var right = box.right ?? 0;
-      var bottom = box.bottom ?? 0;
+      var left = box!.left ?? 0;
+      var top = box!.top ?? 0;
+      var right = box!.right ?? 0;
+      var bottom = box!.bottom ?? 0;
       return '.clockwiseFromTop($top,$right,$bottom,$left)';
     }
   }
@@ -1615,15 +1669,16 @@ abstract class BoxExpression extends DartStyleExpression {
 class MarginExpression extends BoxExpression {
   // TODO(terry): Does auto for margin need to be exposed to Dart UI framework?
   /// Margin expression ripped apart.
-  MarginExpression(SourceSpan span, {num top, num right, num bottom, num left})
+  MarginExpression(SourceSpan span,
+      {num? top, num? right, num? bottom, num? left})
       : super(DartStyleExpression.marginStyle, span,
             BoxEdge(left, top, right, bottom));
 
-  MarginExpression.boxEdge(SourceSpan span, BoxEdge box)
+  MarginExpression.boxEdge(SourceSpan span, BoxEdge? box)
       : super(DartStyleExpression.marginStyle, span, box);
 
   @override
-  MarginExpression merged(DartStyleExpression newMarginExpr) {
+  MarginExpression? merged(DartStyleExpression newMarginExpr) {
     if (newMarginExpr is MarginExpression &&
         isMargin &&
         newMarginExpr.isMargin) {
@@ -1644,7 +1699,7 @@ class MarginExpression extends BoxExpression {
 
   @override
   MarginExpression clone() => MarginExpression(span,
-      top: box.top, right: box.right, bottom: box.bottom, left: box.left);
+      top: box!.top, right: box!.right, bottom: box!.bottom, left: box!.left);
 
   @override
   dynamic visit(VisitorBase visitor) => visitor.visitMarginExpression(this);
@@ -1652,7 +1707,8 @@ class MarginExpression extends BoxExpression {
 
 class BorderExpression extends BoxExpression {
   /// Border expression ripped apart.
-  BorderExpression(SourceSpan span, {num top, num right, num bottom, num left})
+  BorderExpression(SourceSpan span,
+      {num? top, num? right, num? bottom, num? left})
       : super(DartStyleExpression.borderStyle, span,
             BoxEdge(left, top, right, bottom));
 
@@ -1660,7 +1716,7 @@ class BorderExpression extends BoxExpression {
       : super(DartStyleExpression.borderStyle, span, box);
 
   @override
-  BorderExpression merged(DartStyleExpression newBorderExpr) {
+  BorderExpression? merged(DartStyleExpression newBorderExpr) {
     if (newBorderExpr is BorderExpression &&
         isBorder &&
         newBorderExpr.isBorder) {
@@ -1682,7 +1738,7 @@ class BorderExpression extends BoxExpression {
 
   @override
   BorderExpression clone() => BorderExpression(span,
-      top: box.top, right: box.right, bottom: box.bottom, left: box.left);
+      top: box!.top, right: box!.right, bottom: box!.bottom, left: box!.left);
 
   @override
   dynamic visit(VisitorBase visitor) => visitor.visitBorderExpression(this);
@@ -1695,11 +1751,11 @@ class HeightExpression extends DartStyleExpression {
       : super(DartStyleExpression.heightStyle, span);
 
   @override
-  HeightExpression merged(DartStyleExpression newHeightExpr) {
+  HeightExpression? merged(DartStyleExpression newHeightExpr) {
     if (newHeightExpr is DartStyleExpression &&
         isHeight &&
         newHeightExpr.isHeight) {
-      return newHeightExpr;
+      return newHeightExpr as HeightExpression;
     }
 
     return null;
@@ -1718,7 +1774,7 @@ class WidthExpression extends DartStyleExpression {
       : super(DartStyleExpression.widthStyle, span);
 
   @override
-  WidthExpression merged(DartStyleExpression newWidthExpr) {
+  WidthExpression? merged(DartStyleExpression newWidthExpr) {
     if (newWidthExpr is WidthExpression && isWidth && newWidthExpr.isWidth) {
       return newWidthExpr;
     }
@@ -1734,15 +1790,16 @@ class WidthExpression extends DartStyleExpression {
 
 class PaddingExpression extends BoxExpression {
   /// Padding expression ripped apart.
-  PaddingExpression(SourceSpan span, {num top, num right, num bottom, num left})
+  PaddingExpression(SourceSpan span,
+      {num? top, num? right, num? bottom, num? left})
       : super(DartStyleExpression.paddingStyle, span,
             BoxEdge(left, top, right, bottom));
 
-  PaddingExpression.boxEdge(SourceSpan span, BoxEdge box)
+  PaddingExpression.boxEdge(SourceSpan span, BoxEdge? box)
       : super(DartStyleExpression.paddingStyle, span, box);
 
   @override
-  PaddingExpression merged(DartStyleExpression newPaddingExpr) {
+  PaddingExpression? merged(DartStyleExpression newPaddingExpr) {
     if (newPaddingExpr is PaddingExpression &&
         isPadding &&
         newPaddingExpr.isPadding) {
@@ -1764,7 +1821,7 @@ class PaddingExpression extends BoxExpression {
 
   @override
   PaddingExpression clone() => PaddingExpression(span,
-      top: box.top, right: box.right, bottom: box.bottom, left: box.left);
+      top: box!.top, right: box!.right, bottom: box!.bottom, left: box!.left);
   @override
   dynamic visit(VisitorBase visitor) => visitor.visitPaddingExpression(this);
 }

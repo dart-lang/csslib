@@ -559,7 +559,8 @@ class SupportsConditionInParens extends SupportsCondition {
       : condition = declaration,
         super(span);
 
-  SupportsConditionInParens.nested(SupportsCondition condition, SourceSpan? span)
+  SupportsConditionInParens.nested(
+      SupportsCondition condition, SourceSpan? span)
       : condition = condition,
         super(span);
 
@@ -1248,7 +1249,8 @@ class NumberTerm extends LiteralTerm {
 class UnitTerm extends LiteralTerm {
   final int unit;
 
-  UnitTerm(value, String t, SourceSpan? span, this.unit) : super(value, t, span);
+  UnitTerm(value, String t, SourceSpan? span, this.unit)
+      : super(value, t, span);
 
   @override
   UnitTerm clone() => UnitTerm(value, text, span, unit);

@@ -280,7 +280,7 @@ div {
 
   parseCss(input, errors: errors);
   expect(errors.length, 1);
-  var errorMessage = messages!.messages[0];
+  var errorMessage = messages.messages[0];
   expect(errorMessage.message, contains('Bad hex number'));
   expect(errorMessage.span, isNotNull);
   expect(errorMessage.span!.start.line, 4);
@@ -297,28 +297,28 @@ div {
 ''';
   parseCss(input2, errors: errors..clear());
   expect(errors.length, 4);
-  errorMessage = messages!.messages[0];
+  errorMessage = messages.messages[0];
   expect(errorMessage.message, contains(':, but found +'));
   expect(errorMessage.span, isNotNull);
   expect(errorMessage.span!.start.line, 1);
   expect(errorMessage.span!.start.column, 7);
   expect(errorMessage.span!.text, '+');
 
-  errorMessage = messages!.messages[1];
+  errorMessage = messages.messages[1];
   expect(errorMessage.message, contains('Unknown property value ul'));
   expect(errorMessage.span, isNotNull);
   expect(errorMessage.span!.start.line, 1);
   expect(errorMessage.span!.start.column, 9);
   expect(errorMessage.span!.text, 'ul');
 
-  errorMessage = messages!.messages[2];
+  errorMessage = messages.messages[2];
   expect(errorMessage.message, contains('expected }, but found >'));
   expect(errorMessage.span, isNotNull);
   expect(errorMessage.span!.start.line, 1);
   expect(errorMessage.span!.start.column, 18);
   expect(errorMessage.span!.text, '>');
 
-  errorMessage = messages!.messages[3];
+  errorMessage = messages.messages[3];
   expect(errorMessage.message, contains('premature end of file unknown CSS'));
   expect(errorMessage.span, isNotNull);
   expect(errorMessage.span!.start.line, 1);
@@ -334,14 +334,14 @@ div {
 ''';
   parseCss(input3, errors: errors..clear());
   expect(errors.length, 2);
-  errorMessage = messages!.messages[0];
+  errorMessage = messages.messages[0];
   expect(errorMessage.message, contains('Bad hex number'));
   expect(errorMessage.span, isNotNull);
   expect(errorMessage.span!.start.line, 2);
   expect(errorMessage.span!.start.column, 11);
   expect(errorMessage.span!.text, '#green');
 
-  errorMessage = messages!.messages[1];
+  errorMessage = messages.messages[1];
   expect(errorMessage.message, contains('expected }, but found end of file'));
   expect(errorMessage.span, isNotNull);
   expect(errorMessage.span!.start.line, 3);

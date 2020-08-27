@@ -474,7 +474,6 @@ void undefinedVars() {
   var stylesheet =
       polyFillCompileCss(input, errors: errors..clear(), opts: options);
 
-
   expect(errors.length, errorStrings.length, reason: errors.toString());
   testBitMap = 0;
 

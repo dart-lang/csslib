@@ -404,7 +404,7 @@ abstract class TokenizerBase {
     if (hexValue < 0xD800 || hexValue > 0xDFFF && hexValue <= 0xFFFF) {
       return hexValue;
     } else if (hexValue <= 0x10FFFF) {
-      messages!.error('unicode values greater than 2 bytes not implemented yet',
+      messages.error('unicode values greater than 2 bytes not implemented yet',
           _file.span(_startIndex, _startIndex + 1));
       return -1;
     } else {

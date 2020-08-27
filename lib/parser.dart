@@ -46,7 +46,7 @@ void _createMessages({List<Message>? errors, PreprocessorOptions? options}) {
 }
 
 /// CSS checked mode enabled.
-bool get isChecked => messages!.options.checked;
+bool get isChecked => messages.options.checked;
 
 // TODO(terry): Remove nested name parameter.
 /// Parse and analyze the CSS file.
@@ -69,7 +69,7 @@ StyleSheet compile(input,
   analyze([tree], errors: errors, options: options);
 
   if (polyfill) {
-    var processCss = PolyFill(messages!);
+    var processCss = PolyFill(messages);
     processCss.process(tree, includes: includes);
   }
 
@@ -80,7 +80,7 @@ StyleSheet compile(input,
 void analyze(List<StyleSheet> styleSheets,
     {List<Message>? errors, PreprocessorOptions? options}) {
   _createMessages(errors: errors, options: options);
-  Analyzer(styleSheets, messages!).run();
+  Analyzer(styleSheets, messages).run();
 }
 
 /// Parse the [input] CSS stylesheet into a tree. The [input] can be a [String],
@@ -312,12 +312,12 @@ class _Parser {
 
   void _error(String message, SourceSpan? location) {
     location ??= _peekToken.span;
-    messages!.error(message, location);
+    messages.error(message, location);
   }
 
   void _warning(String message, SourceSpan? location) {
     location ??= _peekToken.span;
-    messages!.warning(message, location);
+    messages.warning(message, location);
   }
 
   SourceSpan _makeSpan(FileSpan start) {
@@ -867,7 +867,7 @@ class _Parser {
       }
 
       if (tokId == -1) {
-        if (messages!.options.lessSupport) {
+        if (messages.options.lessSupport) {
           // Less compatibility:
           //    @name: value;      =>    var-name: value;       (VarDefinition)
           //    property: @name;   =>    property: var(name);   (VarUsage)
@@ -1129,7 +1129,7 @@ class _Parser {
   /// Return [:null:] if no selector or [SelectorGroup] if a selector was
   /// parsed.
   SelectorGroup? _nestedSelector() {
-    var oldMessages = messages!;
+    var oldMessages = messages;
     _createMessages();
 
     var markedData = _mark;
@@ -1139,7 +1139,7 @@ class _Parser {
 
     var nestedSelector = selGroup != null &&
         _peekKind(TokenKind.LBRACE) &&
-        messages!.messages.isEmpty;
+        messages.messages.isEmpty;
 
     if (!nestedSelector) {
       // Not a selector so restore the world.
@@ -1148,7 +1148,7 @@ class _Parser {
       return null;
     } else {
       // Remember any messages from look ahead.
-      oldMessages.mergeMessages(messages!);
+      oldMessages.mergeMessages(messages);
       messages = oldMessages;
       return selGroup;
     }
@@ -2369,7 +2369,7 @@ class _Parser {
 
         return UnicodeRangeTerm(first, second, _makeSpan(start));
       case TokenKind.AT:
-        if (messages!.options.lessSupport) {
+        if (messages.options.lessSupport) {
           _next();
 
           var expr = processExpr();
@@ -2799,7 +2799,7 @@ class ExpressionsProcessor {
           family.add(expr.toString());
           moreFamilies = false;
         } else if (isChecked) {
-          messages!.warning('Only font-family can be a list', _exprs.span);
+          messages.warning('Only font-family can be a list', _exprs.span);
         }
       } else if (expr is OperatorComma && family.isNotEmpty) {
         moreFamilies = true;

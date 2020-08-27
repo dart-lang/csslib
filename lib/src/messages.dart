@@ -12,7 +12,7 @@ enum MessageLevel { info, warning, severe }
 //              compilation state.
 
 /// The global [Messages] for tracking info/warnings/messages.
-Messages? messages;
+late Messages messages;
 
 // Color constants used for generating messages.
 const _greenColor = '\u001b[32m';

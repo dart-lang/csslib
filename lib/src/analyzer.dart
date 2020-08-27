@@ -450,14 +450,14 @@ class TopLevelIncludes extends Visitor {
 
   @override
   void visitIncludeDirective(IncludeDirective node) {
+    final currDef = this.currDef;
     if (map.containsKey(node.name)) {
       var mixinDef = map[node.name];
       if (mixinDef is MixinRulesetDirective) {
         _TopLevelIncludeReplacer.replace(
             _messages, _styleSheet!, node, mixinDef.rulesets);
-      } else if (currDef is MixinRulesetDirective &&
-          _anyRulesets(currDef as MixinRulesetDirective)) {
-        final mixinRuleset = currDef as MixinRulesetDirective;
+      } else if (currDef is MixinRulesetDirective && _anyRulesets(currDef)) {
+        final mixinRuleset = currDef;
         var index = mixinRuleset.rulesets.indexOf(node);
         mixinRuleset.rulesets.removeAt(index);
         _messages.warning(
@@ -466,7 +466,7 @@ class TopLevelIncludes extends Visitor {
       }
     } else {
       if (currDef is MixinRulesetDirective) {
-        var rulesetDirect = currDef as MixinRulesetDirective;
+        var rulesetDirect = currDef;
         rulesetDirect.rulesets.removeWhere((entry) {
           if (entry == node) {
             _messages.warning('Undefined mixin ${node.name}', node.span);

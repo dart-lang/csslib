@@ -77,7 +77,7 @@ class Messages {
       : options = options ?? PreprocessorOptions();
 
   /// Report a compile-time CSS error.
-  void error(String message, SourceSpan span) {
+  void error(String message, SourceSpan? span) {
     var msg = Message(MessageLevel.severe, message,
         span: span, useColors: options.useColors);
 
@@ -87,7 +87,7 @@ class Messages {
   }
 
   /// Report a compile-time CSS warning.
-  void warning(String message, SourceSpan span) {
+  void warning(String message, SourceSpan? span) {
     if (options.warningsAsErrors) {
       error(message, span);
     } else {

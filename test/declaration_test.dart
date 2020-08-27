@@ -1278,7 +1278,7 @@ void testExpressionSpans() {
   // This passes
   expect(decl.span!.text, 'width: 50px');
   // This currently fails
-  expect((decl as Declaration).expression!.span.text, '50px');
+  expect((decl as Declaration).expression!.span!.text, '50px');
 }
 
 void testComments() {

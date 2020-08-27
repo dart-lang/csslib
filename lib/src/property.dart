@@ -64,9 +64,9 @@ class Color implements _StyleProperty, ColorBase {
   /// components.
   Color.createRgba(int red, int green, int blue, [num? alpha])
       : _argb = Color.convertToHexString(
-            Color._clamp(red, 0, 255) as int,
-            Color._clamp(green, 0, 255) as int,
-            Color._clamp(blue, 0, 255) as int,
+            Color._clamp(red, 0, 255),
+            Color._clamp(green, 0, 255),
+            Color._clamp(blue, 0, 255),
             alpha != null ? Color._clamp(alpha, 0, 1) : alpha);
 
   /// Creates a new color from a CSS color string. For more information, see
@@ -300,7 +300,7 @@ class Color implements _StyleProperty, ColorBase {
     return hex;
   }
 
-  static num _clamp(num value, num min, num max) =>
+  static T _clamp<T extends num>(T value, T min, T max) =>
       math.max(math.min(max, value), min);
 
   /// Change the tint (make color lighter) or shade (make color darker) of all
@@ -320,12 +320,9 @@ class Color implements _StyleProperty, ColorBase {
       //              by converting to HSL and adjust lightness although this
       //              is fastest lighter/darker algorithm.
       // Darkening white special handling.
-      r = Color._clamp((255 + (255 * tintShade)).round().toInt(), 0, 255)
-          as int;
-      g = Color._clamp((255 + (255 * tintShade)).round().toInt(), 0, 255)
-          as int;
-      b = Color._clamp((255 + (255 * tintShade)).round().toInt(), 0, 255)
-          as int;
+      r = Color._clamp((255 + (255 * tintShade)).round().toInt(), 0, 255);
+      g = Color._clamp((255 + (255 * tintShade)).round().toInt(), 0, 255);
+      b = Color._clamp((255 + (255 * tintShade)).round().toInt(), 0, 255);
     } else {
       // All other colors then darkening white go here.
       r = Color._changeTintShadeColor(rgba.r, tintShade).round().toInt();
@@ -505,9 +502,9 @@ class Rgba implements _StyleProperty, ColorBase {
   final num? a;
 
   Rgba(int red, int green, int blue, [num? alpha])
-      : r = Color._clamp(red, 0, 255) as int,
-        g = Color._clamp(green, 0, 255) as int,
-        b = Color._clamp(blue, 0, 255) as int,
+      : r = Color._clamp(red, 0, 255),
+        g = Color._clamp(green, 0, 255),
+        b = Color._clamp(blue, 0, 255),
         a = (alpha != null) ? Color._clamp(alpha, 0, 1) : alpha;
 
   factory Rgba.fromString(String hexValue) =>

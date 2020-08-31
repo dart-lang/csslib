@@ -467,8 +467,8 @@ class TokenKind {
   }
 
   /// Return the token that matches the unit ident found.
-  static int matchList(
-      Iterable<Map<String, dynamic>> identList, String tokenField, String text, int offset, int length) {
+  static int matchList(Iterable<Map<String, dynamic>> identList,
+      String tokenField, String text, int offset, int length) {
     for (final entry in identList) {
       final ident = entry['value'] as String;
 

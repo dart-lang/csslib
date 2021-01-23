@@ -257,11 +257,9 @@ class Color implements _StyleProperty, ColorBase {
       }
       switch (type) {
         case _rgbCss:
-          return Color.convertToHexString(
-              args[0] as num, args[1] as num, args[2] as num);
+          return Color.convertToHexString(args[0], args[1], args[2]);
         case _rgbaCss:
-          return Color.convertToHexString(
-              args[0] as num, args[1] as num, args[2] as num, args[3]);
+          return Color.convertToHexString(args[0], args[1], args[2], args[3]);
         case _hslCss:
           return Hsla(args[0], args[1], args[2]).toHexArgbString();
         case _hslaCss:

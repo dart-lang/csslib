@@ -260,7 +260,7 @@ class TokenKind {
     {'type': TokenKind.MARGIN_DIRECTIVE_RIGHTBOTTOM, 'value': 'right-bottom'},
   ];
 
-  static const List<Map> _UNITS = [
+  static const List<Map<String, dynamic>> _UNITS = [
     {'unit': TokenKind.UNIT_EM, 'value': 'em'},
     {'unit': TokenKind.UNIT_EX, 'value': 'ex'},
     {'unit': TokenKind.UNIT_LENGTH_PX, 'value': 'px'},
@@ -467,10 +467,10 @@ class TokenKind {
   }
 
   /// Return the token that matches the unit ident found.
-  static int matchList(
-      var identList, String tokenField, String text, int offset, int length) {
+  static int matchList(Iterable<Map<String, dynamic>> identList,
+      String tokenField, String text, int offset, int length) {
     for (final entry in identList) {
-      String ident = entry['value'];
+      final ident = entry['value'] as String;
 
       if (length == ident.length) {
         var idx = offset;
@@ -490,7 +490,7 @@ class TokenKind {
 
         if (match) {
           // Completely matched; return the token for this unit.
-          return entry[tokenField];
+          return entry[tokenField] as int;
         }
       }
     }
@@ -518,10 +518,10 @@ class TokenKind {
     return matchList(MEDIA_OPERATORS, 'type', text, offset, length);
   }
 
-  static String idToValue(var identList, int tokenId) {
+  static String? idToValue(var identList, int tokenId) {
     for (var entry in identList) {
       if (tokenId == entry['type']) {
-        return entry['value'];
+        return entry['value'] as String?;
       }
     }
 
@@ -529,14 +529,14 @@ class TokenKind {
   }
 
   /// Return the unit token as its pretty name.
-  static String unitToString(int unitTokenToFind) {
+  static String? unitToString(int unitTokenToFind) {
     if (unitTokenToFind == TokenKind.PERCENT) {
       return '%';
     } else {
       for (final entry in _UNITS) {
-        int unit = entry['unit'];
+        final unit = entry['unit'] as int;
         if (unit == unitTokenToFind) {
-          return entry['value'];
+          return entry['value'] as String?;
         }
       }
     }
@@ -546,22 +546,23 @@ class TokenKind {
 
   /// Match color name, case insensitive match and return the associated color
   /// entry from _EXTENDED_COLOR_NAMES list, return [:null:] if not found.
-  static Map matchColorName(String text) {
+  static Map? matchColorName(String text) {
     var name = text.toLowerCase();
-    return _EXTENDED_COLOR_NAMES.firstWhere((e) => e['name'] == name,
-        orElse: () => null);
+    for (var color in _EXTENDED_COLOR_NAMES) {
+      if (color['name'] == name) return color;
+    }
+    return null;
   }
 
   /// Return RGB value as [int] from a color entry in _EXTENDED_COLOR_NAMES.
   static int colorValue(Map entry) {
-    assert(entry != null);
-    return entry['value'];
+    return entry['value'] as int;
   }
 
-  static String hexToColorName(hexValue) {
+  static String? hexToColorName(hexValue) {
     for (final entry in _EXTENDED_COLOR_NAMES) {
       if (entry['value'] == hexValue) {
-        return entry['name'];
+        return entry['name'] as String?;
       }
     }
 

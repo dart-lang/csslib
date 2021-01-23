@@ -310,7 +310,7 @@ class _TreePrinter extends Visitor {
     if (node.isIE7) output.write('IE7 property');
     output.write('property');
     super.visitDeclaration(node);
-    output.writeNode('expression', node._expression);
+    output.writeNode('expression', node.expression);
     if (node.important) {
       output.writeValue('!important', 'true');
     }
@@ -323,7 +323,7 @@ class _TreePrinter extends Visitor {
     output.depth++;
     output.write('defintion');
     super.visitVarDefinition(node);
-    output.writeNode('expression', node._expression);
+    output.writeNode('expression', node.expression);
     output.depth--;
   }
 
@@ -374,7 +374,7 @@ class _TreePrinter extends Visitor {
 
     super.visitNamespaceSelector(node);
 
-    visitSimpleSelector(node.nameAsSimpleSelector);
+    visitSimpleSelector(node.nameAsSimpleSelector!);
     output.depth--;
   }
 

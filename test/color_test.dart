@@ -1,4 +1,4 @@
-library color;
+library color_test;
 
 import 'package:csslib/parser.dart';
 import 'package:test/test.dart';

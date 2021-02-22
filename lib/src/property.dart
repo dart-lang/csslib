@@ -257,9 +257,11 @@ class Color implements _StyleProperty, ColorBase {
       }
       switch (type) {
         case _rgbCss:
-          return Color.convertToHexString(args[0], args[1], args[2]);
+          return Color.convertToHexString(
+              args[0].toInt(), args[1].toInt(), args[2].toInt());
         case _rgbaCss:
-          return Color.convertToHexString(args[0], args[1], args[2], args[3]);
+          return Color.convertToHexString(
+              args[0].toInt(), args[1].toInt(), args[2].toInt(), args[3]);
         case _hslCss:
           return Hsla(args[0], args[1], args[2]).toHexArgbString();
         case _hslaCss:
@@ -275,7 +277,7 @@ class Color implements _StyleProperty, ColorBase {
 
   static int hexToInt(String hex) => int.parse(hex, radix: 16);
 
-  static String convertToHexString(num r, num g, num b, [num? a]) {
+  static String convertToHexString(int r, int g, int b, [num? a]) {
     var rHex = Color._numAs2DigitHex(Color._clamp(r, 0, 255));
     var gHex = Color._numAs2DigitHex(Color._clamp(g, 0, 255));
     var bHex = Color._numAs2DigitHex(Color._clamp(b, 0, 255));
@@ -288,15 +290,7 @@ class Color implements _StyleProperty, ColorBase {
     return '$aHex$rHex$gHex$bHex'.toLowerCase();
   }
 
-  static String _numAs2DigitHex(num v) {
-    // TODO(terry): v.toInt().toRadixString instead of v.toRadixString
-    //              Bug <http://code.google.com/p/dart/issues/detail?id=2671>.
-    var hex = v.toInt().toRadixString(16);
-    if (hex.length == 1) {
-      hex = '0${hex}';
-    }
-    return hex;
-  }
+  static String _numAs2DigitHex(int v) => v.toRadixString(16).padLeft(2, '0');
 
   static T _clamp<T extends num>(T value, T min, T max) =>
       math.max(math.min(max, value), min);

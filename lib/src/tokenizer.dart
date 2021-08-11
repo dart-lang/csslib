@@ -67,14 +67,13 @@ class Tokenizer extends TokenizerBase {
         if (maybeEatDigit()) {
           // looks like a number dot followed by digit(s).
           var number = finishNumber();
-          if (number.kind == TokenKind.INTEGER) {
-            // It's a number but it's preceeded by a dot, so make it a double.
-            _startIndex = start;
-            return _finishToken(TokenKind.DOUBLE);
-          } else {
-            // Don't allow dot followed by a double (e.g,  '..1').
+          if (number.text.substring(1).contains('.')) {
+            // Don't allow dot followed by another dot
             return _errorToken();
           }
+
+          _startIndex = start;
+          return _finishToken(TokenKind.DOUBLE);
         }
         // It's really a dot.
         return _finishToken(TokenKind.DOT);
@@ -330,10 +329,13 @@ class Tokenizer extends TokenizerBase {
       _nextChar();
       if (TokenizerHelpers.isDigit(_peekChar())) {
         eatDigits();
+        maybeEatExponentialNotation();
         return _finishToken(TokenKind.DOUBLE);
       } else {
         _index -= 1;
       }
+    } else if (maybeEatExponentialNotation()) {
+      return _finishToken(TokenKind.DOUBLE);
     }
 
     return _finishToken(TokenKind.INTEGER);
@@ -345,6 +347,36 @@ class Tokenizer extends TokenizerBase {
       _index += 1;
       return true;
     }
+    return false;
+  }
+
+  bool maybeEatExponentialNotation() {
+    final ch = _peekChar();
+    if (ch != 69 /*E*/ && ch != 101 /*e*/) {
+      return false;
+    }
+
+    if (_startIndex > 0 &&
+        _text.codeUnitAt(_startIndex - 1) == TokenChar.HASH) {
+      // Don't do this if the previous character is a hash
+      return false;
+    }
+
+    final first = _peekChar(1);
+    if (TokenizerHelpers.isDigit(first)) {
+      _nextChar();
+      eatDigits();
+      return true;
+    } else if (first == TokenChar.PLUS || first == TokenChar.MINUS) {
+      final second = _peekChar(2);
+      if (TokenizerHelpers.isDigit(second)) {
+        _nextChar();
+        _nextChar();
+        eatDigits();
+        return true;
+      }
+    }
+
     return false;
   }
 

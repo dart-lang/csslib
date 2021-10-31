@@ -55,7 +55,7 @@ class CssPrinter extends Visitor {
 
   @override
   void visitMediaExpression(MediaExpression node) {
-    emit(node.andOperator ? ' AND ' : ' ');
+    emit(node.andOperator ? ' and ' : ' ');
     emit('(${node.mediaFeature}');
     if (node.exprs.expressions.isNotEmpty) {
       emit(':');

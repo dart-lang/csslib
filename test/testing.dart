@@ -7,6 +7,7 @@ library testing;
 
 import 'package:csslib/parser.dart';
 import 'package:csslib/visitor.dart';
+import 'package:term_glyph/term_glyph.dart';
 
 export 'package:csslib/src/preprocessor_options.dart';
 
@@ -57,13 +58,13 @@ final _cssVisitor = Visitor();
 
 /// Pretty printer for CSS.
 String prettyPrint(StyleSheet ss) {
-  // Walk the tree testing basic Vistor class.
+  // Walk the tree testing basic Visitor class.
   walkTree(ss);
   return (_emitCss..visitTree(ss, pretty: true)).toString();
 }
 
 /// Helper function to emit compact (non-pretty printed) CSS for suite test
-/// comparsions.  Spaces, new lines, etc. are reduced for easier comparsions of
+/// comparisons.  Spaces, new lines, etc. are reduced for easier comparisons of
 /// expected suite test results.
 String compactOutput(StyleSheet ss) {
   walkTree(ss);
@@ -76,3 +77,15 @@ void walkTree(StyleSheet ss) {
 }
 
 String dumpTree(StyleSheet ss) => treeToDebugString(ss);
+
+/// StringRegionPatcher extends String to add a [patchGlyphs] method.
+extension StringRegionPatcher on String {
+  /// patchRegion replaces special characters describing spans that are used in
+  /// the literal error messages throughout the tests to avoid errors related to
+  /// absence of unicode glyphs depending on their runtime existence.
+  String patchGlyphs() {
+    return replaceAll('╷', glyphs.downEnd)
+        .replaceAll('│', glyphs.verticalLine)
+        .replaceAll('╵', glyphs.upEnd);
+  }
+}

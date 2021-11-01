@@ -438,7 +438,7 @@ void undefinedVars() {
         '17 │   var-def-2: var(def-3);\n'
         '   │                  ^^^^^^\n'
         '   ╵',
-  ];
+  ].map((e) => e.patchGlyphs()).toList();
 
   var generated = r'''
 :root {

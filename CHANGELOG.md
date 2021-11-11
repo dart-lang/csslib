@@ -1,3 +1,8 @@
+## 0.17.2
+
+- Comma separate keyframe percentage lists.
+- Use lowercase `and` in media queries.
+
 ## 0.17.1
 
 - Fix `Color.css` constructor when there are double values in the `rgba` string.

@@ -7,7 +7,6 @@ library testing;
 
 import 'package:csslib/parser.dart';
 import 'package:csslib/visitor.dart';
-import 'package:term_glyph/term_glyph.dart';
 
 export 'package:csslib/src/preprocessor_options.dart';
 

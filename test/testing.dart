@@ -77,15 +77,3 @@ void walkTree(StyleSheet ss) {
 }
 
 String dumpTree(StyleSheet ss) => treeToDebugString(ss);
-
-/// StringRegionPatcher extends String to add a [patchGlyphs] method.
-extension StringRegionPatcher on String {
-  /// patchRegion replaces special characters describing spans that are used in
-  /// the literal error messages throughout the tests to avoid errors related to
-  /// absence of unicode glyphs depending on their runtime existence.
-  String patchGlyphs() {
-    return replaceAll('╷', glyphs.downEnd)
-        .replaceAll('│', glyphs.verticalLine)
-        .replaceAll('╵', glyphs.upEnd);
-  }
-}

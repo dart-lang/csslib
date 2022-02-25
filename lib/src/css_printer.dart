@@ -218,9 +218,11 @@ class CssPrinter extends Visitor {
     emit('$_newLine${node.keyFrameName} ');
     node.name!.visit(this);
     emit('$_sp{$_newLine');
+    _isInKeyframes = true;
     for (final block in node._blocks) {
       block.visit(this);
     }
+    _isInKeyframes = false;
     emit('}');
   }
 
@@ -237,9 +239,7 @@ class CssPrinter extends Visitor {
     emit('$_sp$_sp');
     node._blockSelectors.visit(this);
     emit('$_sp{$_newLine');
-    _isInKeyframes = true;
     node._declarations.visit(this);
-    _isInKeyframes = false;
     emit('$_sp$_sp}$_newLine');
   }
 

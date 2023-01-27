@@ -643,13 +643,13 @@ class CssPrinter extends Visitor {
   @override
   void visitBinaryExpression(BinaryExpression node) {
     // TODO(terry): TBD
-    throw UnimplementedError;
+    throw UnimplementedError('visitBinaryExpression');
   }
 
   @override
   void visitUnaryExpression(UnaryExpression node) {
     // TODO(terry): TBD
-    throw UnimplementedError;
+    throw UnimplementedError('visitUnaryExpression');
   }
 
   @override
@@ -665,6 +665,6 @@ class CssPrinter extends Visitor {
   @override
   void visitDartStyleExpression(DartStyleExpression node) {
     // TODO(terry): TBD
-    throw UnimplementedError;
+    throw UnimplementedError('visitDartStyleExpression');
   }
 }

@@ -197,7 +197,7 @@ class CssPrinter extends Visitor {
 
   @override
   void visitImportDirective(ImportDirective node) {
-    bool isStartingQuote(String ch) => ('\'"'.contains(ch[0]));
+    bool isStartingQuote(String ch) => '\'"'.contains(ch[0]);
 
     if (_isTesting) {
       // Emit assuming url() was parsed; most suite tests use url function.
@@ -250,7 +250,7 @@ class CssPrinter extends Visitor {
 
   @override
   void visitNamespaceDirective(NamespaceDirective node) {
-    bool isStartingQuote(String ch) => ('\'"'.contains(ch));
+    bool isStartingQuote(String ch) => '\'"'.contains(ch);
 
     if (isStartingQuote(node._uri!)) {
       emit(' @namespace ${node.prefix}"${node._uri}"');

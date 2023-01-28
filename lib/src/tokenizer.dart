@@ -449,13 +449,13 @@ class TokenizerHelpers {
   }
 
   static bool isDigit(int c) {
-    return (c >= 48 /*0*/ && c <= 57 /*9*/);
+    return c >= 48 /*0*/ && c <= 57 /*9*/;
   }
 
   static bool isHexDigit(int c) {
-    return (isDigit(c) ||
+    return isDigit(c) ||
         (c >= 97 /*a*/ && c <= 102 /*f*/) ||
-        (c >= 65 /*A*/ && c <= 70 /*F*/));
+        (c >= 65 /*A*/ && c <= 70 /*F*/);
   }
 
   static bool isIdentifierPart(int c) {
@@ -464,7 +464,7 @@ class TokenizerHelpers {
 
   /// Pseudo function expressions identifiers can't have a minus sign.
   static bool isIdentifierStartExpr(int c) {
-    return ((c >= 97 /*a*/ && c <= 122 /*z*/) ||
+    return (c >= 97 /*a*/ && c <= 122 /*z*/) ||
         (c >= 65 /*A*/ && c <= 90 /*Z*/) ||
         // Note: Unicode 10646 chars U+00A0 or higher are allowed, see:
         // http://www.w3.org/TR/CSS21/syndata.html#value-def-identifier
@@ -472,11 +472,11 @@ class TokenizerHelpers {
         // Also, escaped character should be allowed.
         c == 95 /*_*/ ||
         c >= 0xA0 ||
-        c == 92 /*\*/);
+        c == 92 /*\*/;
   }
 
   /// Pseudo function expressions identifiers can't have a minus sign.
   static bool isIdentifierPartExpr(int c) {
-    return (isIdentifierStartExpr(c) || isDigit(c));
+    return isIdentifierStartExpr(c) || isDigit(c);
   }
 }

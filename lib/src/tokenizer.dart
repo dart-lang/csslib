@@ -4,6 +4,9 @@
 
 part of '../parser.dart';
 
+// todo: doc
+// https://www.w3.org/TR/css-syntax-3/#tokenization
+
 class Tokenizer extends TokenizerBase {
   /// U+ prefix for unicode characters.
   // ignore: non_constant_identifier_names

@@ -70,6 +70,13 @@ String compactOutput(StyleSheet ss) {
   return (_emitCss..visitTree(ss, pretty: false)).toString();
 }
 
+String printExpressions(Expressions node) {
+  var printer = CssPrinter();
+  // TODO: It would be nice if TreeNode had an `accept` method.
+  printer.visitExpressions(node);
+  return printer.toString();
+}
+
 /// Walks the style sheet tree does nothing; insures the basic walker works.
 void walkTree(StyleSheet ss) {
   _cssVisitor.visitTree(ss);

@@ -64,8 +64,8 @@ class Negation extends TreeNode {
 class CalcTerm extends LiteralTerm {
   final LiteralTerm expr;
 
-  CalcTerm(Object value, String t, this.expr, SourceSpan? span)
-      : super(value, t, span);
+  CalcTerm(Object value, String text, this.expr, SourceSpan? span)
+      : super(value, text, span);
 
   @override
   CalcTerm clone() => CalcTerm(value, text, expr.clone(), span);
@@ -1242,7 +1242,7 @@ class LiteralTerm extends Expression {
 }
 
 class NumberTerm extends LiteralTerm {
-  NumberTerm(super.value, super.t, super.span);
+  NumberTerm(super.value, super.text, super.span);
   @override
   NumberTerm clone() => NumberTerm(value, text, span);
   @override
@@ -1252,7 +1252,7 @@ class NumberTerm extends LiteralTerm {
 class UnitTerm extends LiteralTerm {
   final int unit;
 
-  UnitTerm(super.value, super.t, super.span, this.unit);
+  UnitTerm(super.value, super.text, super.span, this.unit);
 
   @override
   UnitTerm clone() => UnitTerm(value, text, span, unit);
@@ -1267,7 +1267,7 @@ class UnitTerm extends LiteralTerm {
 }
 
 class LengthTerm extends UnitTerm {
-  LengthTerm(super.value, super.t, super.span,
+  LengthTerm(super.value, super.text, super.span,
       [super.unit = TokenKind.UNIT_LENGTH_PX]) {
     assert(unit == TokenKind.UNIT_LENGTH_PX ||
         unit == TokenKind.UNIT_LENGTH_CM ||
@@ -1283,7 +1283,7 @@ class LengthTerm extends UnitTerm {
 }
 
 class PercentageTerm extends LiteralTerm {
-  PercentageTerm(super.value, super.t, super.span);
+  PercentageTerm(super.value, super.text, super.span);
   @override
   PercentageTerm clone() => PercentageTerm(value, text, span);
   @override
@@ -1291,7 +1291,7 @@ class PercentageTerm extends LiteralTerm {
 }
 
 class EmTerm extends LiteralTerm {
-  EmTerm(super.value, super.t, super.span);
+  EmTerm(super.value, super.text, super.span);
   @override
   EmTerm clone() => EmTerm(value, text, span);
   @override
@@ -1299,7 +1299,7 @@ class EmTerm extends LiteralTerm {
 }
 
 class ExTerm extends LiteralTerm {
-  ExTerm(super.value, super.t, super.span);
+  ExTerm(super.value, super.text, super.span);
   @override
   ExTerm clone() => ExTerm(value, text, span);
   @override
@@ -1307,7 +1307,7 @@ class ExTerm extends LiteralTerm {
 }
 
 class AngleTerm extends UnitTerm {
-  AngleTerm(super.value, super.t, super.span,
+  AngleTerm(super.value, super.text, super.span,
       [super.unit = TokenKind.UNIT_LENGTH_PX]) {
     assert(unit == TokenKind.UNIT_ANGLE_DEG ||
         unit == TokenKind.UNIT_ANGLE_RAD ||
@@ -1322,7 +1322,7 @@ class AngleTerm extends UnitTerm {
 }
 
 class TimeTerm extends UnitTerm {
-  TimeTerm(super.value, super.t, super.span,
+  TimeTerm(super.value, super.text, super.span,
       [super.unit = TokenKind.UNIT_LENGTH_PX]) {
     assert(unit == TokenKind.UNIT_ANGLE_DEG ||
         unit == TokenKind.UNIT_TIME_MS ||
@@ -1336,9 +1336,9 @@ class TimeTerm extends UnitTerm {
 }
 
 class FreqTerm extends UnitTerm {
-  FreqTerm(Object value, String t, SourceSpan? span,
+  FreqTerm(Object value, String text, SourceSpan? span,
       [int unit = TokenKind.UNIT_LENGTH_PX])
-      : super(value, t, span, unit) {
+      : super(value, text, span, unit) {
     assert(unit == TokenKind.UNIT_FREQ_HZ || unit == TokenKind.UNIT_FREQ_KHZ);
   }
 
@@ -1349,7 +1349,7 @@ class FreqTerm extends UnitTerm {
 }
 
 class FractionTerm extends LiteralTerm {
-  FractionTerm(super.value, super.t, super.span);
+  FractionTerm(super.value, super.text, super.span);
 
   @override
   FractionTerm clone() => FractionTerm(value, text, span);
@@ -1367,9 +1367,9 @@ class UriTerm extends LiteralTerm {
 }
 
 class ResolutionTerm extends UnitTerm {
-  ResolutionTerm(Object value, String t, SourceSpan? span,
+  ResolutionTerm(Object value, String text, SourceSpan? span,
       [int unit = TokenKind.UNIT_LENGTH_PX])
-      : super(value, t, span, unit) {
+      : super(value, text, span, unit) {
     assert(unit == TokenKind.UNIT_RESOLUTION_DPI ||
         unit == TokenKind.UNIT_RESOLUTION_DPCM ||
         unit == TokenKind.UNIT_RESOLUTION_DPPX);
@@ -1382,9 +1382,9 @@ class ResolutionTerm extends UnitTerm {
 }
 
 class ChTerm extends UnitTerm {
-  ChTerm(Object value, String t, SourceSpan? span,
+  ChTerm(Object value, String text, SourceSpan? span,
       [int unit = TokenKind.UNIT_LENGTH_PX])
-      : super(value, t, span, unit) {
+      : super(value, text, span, unit) {
     assert(unit == TokenKind.UNIT_CH);
   }
 
@@ -1395,9 +1395,9 @@ class ChTerm extends UnitTerm {
 }
 
 class RemTerm extends UnitTerm {
-  RemTerm(Object value, String t, SourceSpan? span,
+  RemTerm(Object value, String text, SourceSpan? span,
       [int unit = TokenKind.UNIT_LENGTH_PX])
-      : super(value, t, span, unit) {
+      : super(value, text, span, unit) {
     assert(unit == TokenKind.UNIT_REM);
   }
 
@@ -1408,9 +1408,9 @@ class RemTerm extends UnitTerm {
 }
 
 class ViewportTerm extends UnitTerm {
-  ViewportTerm(Object value, String t, SourceSpan? span,
+  ViewportTerm(Object value, String text, SourceSpan? span,
       [int unit = TokenKind.UNIT_LENGTH_PX])
-      : super(value, t, span, unit) {
+      : super(value, text, span, unit) {
     assert(unit == TokenKind.UNIT_VIEWPORT_VW ||
         unit == TokenKind.UNIT_VIEWPORT_VH ||
         unit == TokenKind.UNIT_VIEWPORT_VMIN ||
@@ -1428,7 +1428,7 @@ class ViewportTerm extends UnitTerm {
 class BAD_HEX_VALUE {}
 
 class HexColorTerm extends LiteralTerm {
-  HexColorTerm(super.value, super.t, super.span);
+  HexColorTerm(super.value, super.text, super.span);
 
   @override
   HexColorTerm clone() => HexColorTerm(value, text, span);
@@ -1439,8 +1439,8 @@ class HexColorTerm extends LiteralTerm {
 class FunctionTerm extends LiteralTerm {
   final Expressions _params;
 
-  FunctionTerm(Object value, String t, this._params, SourceSpan? span)
-      : super(value, t, span);
+  FunctionTerm(Object value, String text, this._params, SourceSpan? span)
+      : super(value, text, span);
 
   @override
   FunctionTerm clone() => FunctionTerm(value, text, _params.clone(), span);
@@ -1475,7 +1475,7 @@ class GroupTerm extends Expression {
 }
 
 class ItemTerm extends NumberTerm {
-  ItemTerm(super.value, super.t, super.span);
+  ItemTerm(super.value, super.text, super.span);
 
   @override
   ItemTerm clone() => ItemTerm(value, text, span);

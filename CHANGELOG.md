@@ -2,6 +2,7 @@
 
 - Add markdown badges to the readme.
 - Adopted `package:dart_flutter_team_lints` linting rules.
+- Addressed an issue parsing font names not surrounded by quotes.
 
 ## 0.17.2
 

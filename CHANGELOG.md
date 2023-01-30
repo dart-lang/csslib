@@ -2,6 +2,7 @@
 
 - Add markdown badges to the readme.
 - Adopted `package:dart_flutter_team_lints` linting rules.
+- Addressed an issue with the indent level of the `CssPrinter` output.
 
 ## 0.17.2
 

@@ -667,7 +667,6 @@ void testVar() {
   final generated = '''
 var-color-background: #f00;
 var-color-foreground: #00f;
-
 .test {
   background-color: var(color-background);
   color: var(color-foreground);
@@ -692,7 +691,6 @@ var-color-foreground: #00f;
   final generated2 = '''
 var-color-background: #f00;
 var-color-foreground: #00f;
-
 .test {
   background-color: var(color-background);
   color: var(color-foreground);
@@ -720,7 +718,6 @@ void testLess() {
   final generated = '''
 var-color-background: #f00;
 var-color-foreground: #00f;
-
 .test {
   background-color: var(color-background);
   color: var(color-foreground);
@@ -745,7 +742,6 @@ var-color-foreground: #00f;
   final generated2 = '''
 var-color-background: #f00;
 var-color-foreground: #00f;
-
 .test {
   background-color: var(color-background);
   color: var(color-foreground);

@@ -353,17 +353,18 @@ void mediaNesting() {
   }
 }
 ''';
-  final generated = r'''@media screen AND (-webkit-min-device-pixel-ratio:0) {
-#toggle-all {
-  image: url("test.jpb");
-  color: #f00;
-}
-#toggle-all div, #toggle-all table {
-  background: none;
-}
-#toggle-all div a, #toggle-all table a {
-  width: 100px;
-}
+  final generated = r'''
+@media screen AND (-webkit-min-device-pixel-ratio:0) {
+  #toggle-all {
+    image: url("test.jpb");
+    color: #f00;
+  }
+  #toggle-all div, #toggle-all table {
+    background: none;
+  }
+  #toggle-all div a, #toggle-all table a {
+    width: 100px;
+  }
 }''';
 
   compileAndValidate(input, generated);

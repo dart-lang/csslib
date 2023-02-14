@@ -1410,8 +1410,7 @@ class RemTerm extends UnitTerm {
 }
 
 class LineHeightTerm extends UnitTerm {
-  LineHeightTerm(Object value, String text, SourceSpan? span,
-      [int unit = TokenKind.UNIT_LENGTH_PX])
+  LineHeightTerm(Object value, String text, SourceSpan? span, int unit)
       : super(value, text, span, unit) {
     assert(unit == TokenKind.UNIT_LH || unit == TokenKind.UNIT_RLH);
   }

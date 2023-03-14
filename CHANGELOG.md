@@ -5,6 +5,7 @@
 - Fixed the reported span for `Expression` nodes.
 - Fixed a regression parsing declaration values containing spaces.
 - Add support for `lh` and `rlh` units.
+- Require Dart 2.19.
 
 ## 0.17.2
 
@@ -185,7 +186,7 @@
 
 ## 0.12.0+1
 
-* Allow the lastest version of `logging` package.
+* Allow the latest version of `logging` package.
 
 ## 0.12.0
 

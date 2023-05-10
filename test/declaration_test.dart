@@ -759,53 +759,62 @@ src: url(ideal-sans-serif.woff) format("woff"),
 }
 
 void testFontFamily() {
-  var errors = <Message>[];
-  var stylesheet = parseCss('''
+  test('quoted', () {
+    var errors = <Message>[];
+    var stylesheet = parseCss('''
 body {
   font-family: "Arial Narrow";
 }''', errors: errors..clear(), opts: simpleOptions);
-  expect(errors.isEmpty, true, reason: errors.toString());
-  expect(prettyPrint(stylesheet), '''
+    expect(errors.isEmpty, true, reason: errors.toString());
+    expect(prettyPrint(stylesheet), '''
 body {
   font-family: "Arial Narrow";
 }''');
-  var ruleSet = stylesheet.topLevels.first as RuleSet;
-  var declaration = ruleSet.declarationGroup.declarations.first as Declaration;
-  var expressions = declaration.expression as Expressions;
-  expect(declaration.property, 'font-family');
-  expect(printExpressions(expressions), '"Arial Narrow"');
+    var ruleSet = stylesheet.topLevels.first as RuleSet;
+    var declaration =
+        ruleSet.declarationGroup.declarations.first as Declaration;
+    var expressions = declaration.expression as Expressions;
+    expect(declaration.property, 'font-family');
+    expect(printExpressions(expressions), '"Arial Narrow"');
+  });
 
-  errors.clear();
-  stylesheet = parseCss('''
+  test('without quotes', () {
+    var errors = <Message>[];
+    var stylesheet = parseCss('''
 body {
   font-family: Arial Narrow;
 }''', errors: errors..clear(), opts: simpleOptions);
-  expect(errors.isEmpty, true, reason: errors.toString());
-  expect(prettyPrint(stylesheet), '''
+    expect(errors.isEmpty, true, reason: errors.toString());
+    expect(prettyPrint(stylesheet), '''
 body {
   font-family: Arial Narrow;
 }''');
-  ruleSet = stylesheet.topLevels.first as RuleSet;
-  declaration = ruleSet.declarationGroup.declarations.first as Declaration;
-  expressions = declaration.expression as Expressions;
-  expect(declaration.property, 'font-family');
-  expect(printExpressions(expressions), 'Arial Narrow');
+    var ruleSet = stylesheet.topLevels.first as RuleSet;
+    var declaration =
+        ruleSet.declarationGroup.declarations.first as Declaration;
+    var expressions = declaration.expression as Expressions;
+    expect(declaration.property, 'font-family');
+    expect(printExpressions(expressions), 'Arial Narrow');
+  });
 
-  errors.clear();
-  stylesheet = parseCss('''
+  test('starts with identifier', () {
+    var errors = <Message>[];
+    var stylesheet = parseCss('''
 body {
   font-family: PT Sans;
 }''', errors: errors..clear(), opts: simpleOptions);
-  expect(errors.isEmpty, true, reason: errors.toString());
-  expect(prettyPrint(stylesheet), '''
+    expect(errors.isEmpty, true, reason: errors.toString());
+    expect(prettyPrint(stylesheet), '''
 body {
   font-family: PT Sans;
 }''');
-  ruleSet = stylesheet.topLevels.first as RuleSet;
-  declaration = ruleSet.declarationGroup.declarations.first as Declaration;
-  expressions = declaration.expression as Expressions;
-  expect(declaration.property, 'font-family');
-  expect(printExpressions(expressions), 'PT Sans');
+    var ruleSet = stylesheet.topLevels.first as RuleSet;
+    var declaration =
+        ruleSet.declarationGroup.declarations.first as Declaration;
+    var expressions = declaration.expression as Expressions;
+    expect(declaration.property, 'font-family');
+    expect(printExpressions(expressions), 'PT Sans');
+  });
 }
 
 void testCssFile() {
@@ -1426,7 +1435,7 @@ void main() {
   test('Supports', testSupports);
   test('Viewport', testViewport);
   test('Font-Face', testFontFace);
-  test('font-family', testFontFamily);
+  group('font-family', testFontFamily);
   test('CSS file', testCssFile);
   test('Compact Emitter', testCompactEmitter);
   test('Selector Negation', testNotSelectors);

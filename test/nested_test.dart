@@ -238,7 +238,7 @@ div > span[attr="foo"] {
 
 void complexNest() {
   final input = '''
-@font-face  { font-family: arial; }
+@font-face { font-family: arial; }
 div { color: #f0f0f0; }
 #header + div {
   color: url(abc.png);
@@ -276,7 +276,7 @@ div { color: #f0f0f0; }
 span { color: #1f1f2f; }
 ''';
 
-  final generated = r'''@font-face  {
+  final generated = r'''@font-face {
   font-family: arial;
 }
 div {

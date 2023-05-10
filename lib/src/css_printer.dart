@@ -38,25 +38,27 @@ class CssPrinter extends Visitor {
   }
 
   void _emitLBrace() {
+    _indent += 2;
+    _buff.write('{');
+
     if (_prettyPrint) {
-      _buff.write('{\n');
+      _buff.writeln();
       _startOfLine = true;
-      _indent += 2;
-    } else {
-      _indent += 2;
-      _buff.write('{');
     }
   }
 
   void _emitRBrace() {
+    _indent -= 2;
+
     if (_prettyPrint) {
       if (!_startOfLine) _buff.write('\n');
-      _indent -= 2;
       _buff.write('${' ' * _indent}}\n');
       _startOfLine = true;
     } else {
-      _indent -= 2;
-      _indent == 0 ? _buff.write('}\n') : _buff.write('}');
+      _buff.write('}');
+      if (_indent == 0) {
+        _buff.writeln();
+      }
     }
   }
 
@@ -74,8 +76,8 @@ class CssPrinter extends Visitor {
     if (_prettyPrint) {
       _buff.write('\n');
       _startOfLine = true;
-    } else {
-      if (force) _buff.write('\n');
+    } else if (force) {
+      _buff.write('\n');
     }
   }
 
@@ -290,7 +292,7 @@ class CssPrinter extends Visitor {
 
   @override
   void visitFontFaceDirective(FontFaceDirective node) {
-    emit('@font-face ');
+    emit('@font-face');
     emit(_sp);
     _emitLBrace();
     node._declarations.visit(this);
@@ -349,7 +351,7 @@ class CssPrinter extends Visitor {
 
   @override
   void visitMixinDeclarationDirective(MixinDeclarationDirective node) {
-    emit('@mixin ${node.name} ');
+    emit('@mixin ${node.name}$_sp');
     _emitLBrace();
     visitDeclarationGroup(node.declarations);
     _emitRBrace();

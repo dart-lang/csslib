@@ -691,7 +691,7 @@ void testFontFace() {
   src: url(fonts/BBCBengali.ttf) format("opentype");
   unicode-range: U+0A-FF, U+980-9FF, U+????, U+3???;
 }''';
-  final generated = '''@font-face  {
+  final generated = '''@font-face {
   font-family: BBCBengali;
   src: url("fonts/BBCBengali.ttf") format("opentype");
   unicode-range: U+0A-FF, U+980-9FF, U+????, U+3???;
@@ -707,7 +707,7 @@ void testFontFace() {
   src: url(http://example.com/fonts/Gentium.ttf);
   src: url(http://example.com/fonts/Gentium.ttf);
 }''';
-  final generated1 = '''@font-face  {
+  final generated1 = '''@font-face {
   font-family: Gentium;
   src: url("http://example.com/fonts/Gentium.ttf");
   src: url("http://example.com/fonts/Gentium.ttf");
@@ -724,7 +724,7 @@ src: url(ideal-sans-serif.woff) format("woff"),
      url(basic-sans-serif.ttf) format("opentype"),
      local(Gentium Bold);
 }''';
-  final generated2 = '@font-face  {\n'
+  final generated2 = '@font-face {\n'
       '  src: url("ideal-sans-serif.woff") '
       'format("woff"), url("basic-sans-serif.ttf") '
       'format("opentype"), local(Gentium Bold);\n}';
@@ -743,7 +743,7 @@ src: url(ideal-sans-serif.woff) format("woff"),
   font-weight: bold;
 }''';
   final generated3 = '''
-@font-face  {
+@font-face {
   font-family: MyGentium Text Ornaments;
   src: local(Gentium Bold), local(Gentium-Bold), url("GentiumBold.ttf");
   font-weight: bold;
@@ -760,7 +760,7 @@ src: url(ideal-sans-serif.woff) format("woff"),
   src: local(STIXGeneral), url(/stixfonts/STIXGeneral.otf);
   unicode-range: U+000-49F, U+2000-27FF, U+2900-2BFF, U+1D400-1D7FF;
 }''';
-  final generated4 = '''@font-face  {
+  final generated4 = '''@font-face {
   font-family: STIXGeneral;
   src: local(STIXGeneral), url("/stixfonts/STIXGeneral.otf");
   unicode-range: U+000-49F, U+2000-27FF, U+2900-2BFF, U+1D400-1D7FF;

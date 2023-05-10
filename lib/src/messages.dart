@@ -48,7 +48,7 @@ class Message {
     if (span == null) {
       return message;
     }
-    
+
     var start = span.start;
     return '${start.line + 1}:${start.column + 1}:$message';
   }

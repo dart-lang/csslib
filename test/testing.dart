@@ -53,13 +53,13 @@ StyleSheet polyFillCompileCss(String input,
 
 /// Pretty printer for CSS.
 String prettyPrint(StyleSheet ss) {
-  // Walk the tree testing basic Vistor class.
+  // Walk the tree testing basic Visitor class.
   walkTree(ss);
   return (CssPrinter()..visitTree(ss, pretty: true)).toString();
 }
 
 /// Helper function to emit compact (non-pretty printed) CSS for suite test
-/// comparsions.  Spaces, new lines, etc. are reduced for easier comparsions of
+/// comparisons. Spaces, new lines, etc. are reduced for easier comparisons of
 /// expected suite test results.
 String compactOutput(StyleSheet ss) {
   walkTree(ss);

@@ -86,7 +86,7 @@ class CssPrinter extends Visitor {
   String get _sp => _prettyPrint ? ' ' : '';
 
   // TODO(terry): When adding obfuscation we'll need isOptimized (compact w/
-  //              obufuscation) and have isTesting (compact no obfuscation) and
+  //              obfuscation) and have isTesting (compact no obfuscation) and
   //              isCompact would be !prettyPrint.  We'll need another boolean
   //              flag for obfuscation.
   bool get _isTesting => !_prettyPrint;
@@ -606,6 +606,11 @@ class CssPrinter extends Visitor {
 
   @override
   void visitViewportTerm(ViewportTerm node) {
+    emit(node.toString());
+  }
+
+  @override
+  void visitLineHeightTerm(LineHeightTerm node) {
     emit(node.toString());
   }
 

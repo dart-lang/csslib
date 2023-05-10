@@ -197,6 +197,8 @@ void testUnits() {
   padding-bottom: 3vmin;
   transform: rotate(20deg);
   voice-pitch: 10hz;
+  height: 4lh;
+  width: 40rlh;
 }
 #id-2 {
   left: 2fr;
@@ -235,6 +237,8 @@ void testUnits() {
   padding-bottom: 3vmin;
   transform: rotate(20deg);
   voice-pitch: 10hz;
+  height: 4lh;
+  width: 40rlh;
 }
 #id-2 {
   left: 2fr;
@@ -1333,15 +1337,15 @@ void testHangs() {
 
 void testExpressionSpans() {
   final input = r'''.foo { width: 50px; }''';
+
   var stylesheet = parseCss(input);
-  var decl = (stylesheet.topLevels.single as RuleSet)
-      .declarationGroup
-      .declarations
-      .single;
-  // This passes
-  expect(decl.span!.text, 'width: 50px');
-  // This currently fails
-  expect((decl as Declaration).expression!.span!.text, '50px');
+  var ruleSet = stylesheet.topLevels.single as RuleSet;
+
+  var declaration = ruleSet.declarationGroup.declarations.single as Declaration;
+  expect(declaration.span.text, 'width: 50px');
+
+  var expressions = declaration.expression as Expressions;
+  expect(expressions.expressions.first.span!.text, '50px');
 }
 
 void testComments() {
@@ -1442,9 +1446,7 @@ void main() {
   test('IE stuff', testIE);
   test('IE declaration syntax', testIEDeclaration);
   test('Hanging bugs', testHangs);
-  test('Expression spans', testExpressionSpans,
-      skip: 'expression spans are broken'
-          ' (https://github.com/dart-lang/csslib/issues/15)');
+  test('Expression spans', testExpressionSpans);
   test('Comments', testComments);
   group('calc function', () {
     test('simple calc', simpleCalc);

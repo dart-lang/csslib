@@ -7,8 +7,7 @@ import 'package:source_span/source_span.dart';
 
 /// Can be thrown on any Css runtime problem includes source location.
 class CssSelectorException extends SourceSpanException {
-  CssSelectorException(String message, [SourceSpan? span])
-      : super(message, span);
+  CssSelectorException(super.message, [super.span]);
 }
 
 List<String> classes = [];
@@ -86,7 +85,7 @@ class Validate {
           }
         } else if (simpleSelector is IdSelector) {
           // Any element id starting with an underscore is a private element id
-          // that doesn't have to match the world of known elemtn ids.
+          // that doesn't have to match the world of known element ids.
           if (!simpleSelector.name.startsWith('_')) {
             for (final id in ids) {
               if (simpleSelector.name == id) {

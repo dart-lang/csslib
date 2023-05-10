@@ -2,8 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library nested_test;
-
 import 'package:csslib/src/messages.dart';
 import 'package:test/test.dart';
 
@@ -238,7 +236,7 @@ div > span[attr="foo"] {
 
 void complexNest() {
   final input = '''
-@font-face  { font-family: arial; }
+@font-face { font-family: arial; }
 div { color: #f0f0f0; }
 #header + div {
   color: url(abc.png);
@@ -276,7 +274,7 @@ div { color: #f0f0f0; }
 span { color: #1f1f2f; }
 ''';
 
-  final generated = r'''@font-face  {
+  final generated = r'''@font-face {
   font-family: arial;
 }
 div {
@@ -353,17 +351,18 @@ void mediaNesting() {
   }
 }
 ''';
-  final generated = r'''@media screen AND (-webkit-min-device-pixel-ratio:0) {
-#toggle-all {
-  image: url("test.jpb");
-  color: #f00;
-}
-#toggle-all div, #toggle-all table {
-  background: none;
-}
-#toggle-all div a, #toggle-all table a {
-  width: 100px;
-}
+  final generated = r'''
+@media screen AND (-webkit-min-device-pixel-ratio:0) {
+  #toggle-all {
+    image: url("test.jpb");
+    color: #f00;
+  }
+  #toggle-all div, #toggle-all table {
+    background: none;
+  }
+  #toggle-all div a, #toggle-all table a {
+    width: 100px;
+  }
 }''';
 
   compileAndValidate(input, generated);

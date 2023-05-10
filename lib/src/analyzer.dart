@@ -31,27 +31,29 @@ class Analyzer {
   //               possibly combine in one walk.
   void run() {
     // Expand top-level @include.
-    _styleSheets.forEach(
-        (styleSheet) => TopLevelIncludes.expand(_messages, _styleSheets));
+    TopLevelIncludes.expand(_messages, _styleSheets);
 
     // Expand @include in declarations.
-    _styleSheets.forEach(
-        (styleSheet) => DeclarationIncludes.expand(_messages, _styleSheets));
+    DeclarationIncludes.expand(_messages, _styleSheets);
 
     // Remove all @mixin and @include
-    _styleSheets.forEach((styleSheet) => MixinsAndIncludes.remove(styleSheet));
+    for (var styleSheet in _styleSheets) {
+      MixinsAndIncludes.remove(styleSheet);
+    }
 
-    // Expand any nested selectors using selector desendant combinator to
+    // Expand any nested selectors using selector descendant combinator to
     // signal CSS inheritance notation.
-    _styleSheets.forEach((styleSheet) => ExpandNestedSelectors()
-      ..visitStyleSheet(styleSheet)
-      ..flatten(styleSheet));
+    for (var styleSheet in _styleSheets) {
+      ExpandNestedSelectors()
+        ..visitStyleSheet(styleSheet)
+        ..flatten(styleSheet);
+    }
 
     // Expand any @extend.
-    _styleSheets.forEach((styleSheet) {
+    for (var styleSheet in _styleSheets) {
       var allExtends = AllExtends()..visitStyleSheet(styleSheet);
       InheritExtends(_messages, allExtends).visitStyleSheet(styleSheet);
-    });
+    }
   }
 }
 
@@ -163,14 +165,14 @@ class Analyzer {
 ///                       Declaration (property = color, expression = red)
 ///
 /// Nested rules is a terse mechanism to describe CSS inheritance.  The analyzer
-/// will flatten and expand the nested rules to it's flatten strucure.  Using
+/// will flatten and expand the nested rules to it's flatten structure.  Using
 /// the all parent [RuleSets] (selector expressions) and applying each nested
 /// [RuleSet] to the list of [Selectors] in a [SelectorGroup].
 ///
 /// Then result is a style sheet where all nested rules have been flatten and
 /// expanded.
 class ExpandNestedSelectors extends Visitor {
-  /// Parent [RuleSet] if a nested rule otherwise [:null:].
+  /// Parent [RuleSet] if a nested rule otherwise `null`.
   RuleSet? _parentRuleSet;
 
   /// Top-most rule if nested rules.
@@ -251,7 +253,7 @@ class ExpandNestedSelectors extends Visitor {
   }
 
   /// Merge the nested selector sequences [current] to the [parent] sequences or
-  /// substitue any & with the parent selector.
+  /// substitute any & with the parent selector.
   List<SimpleSelectorSequence> _mergeNestedSelector(
       List<SimpleSelectorSequence> parent,
       List<SimpleSelectorSequence> current) {
@@ -268,7 +270,7 @@ class ExpandNestedSelectors extends Visitor {
     } else {
       for (var sequence in current) {
         if (sequence.simpleSelector.isThis) {
-          // Substitue the & with the parent selector and only use a combinator
+          // Substitute the & with the parent selector and only use a combinator
           // descendant if & is prefix by a sequence with an empty name e.g.,
           // "... + &", "&", "... ~ &", etc.
           var hasPrefix = newSequence.isNotEmpty &&
@@ -541,7 +543,7 @@ class _TopLevelIncludeReplacer extends Visitor {
 /// Utility function to match an include to a list of either Declarations or
 /// RuleSets, depending on type of mixin (ruleset or declaration).  The include
 /// can be an include in a declaration or an include directive (top-level).
-int _findInclude(List list, TreeNode node) {
+int _findInclude(List<Object> list, TreeNode node) {
   final matchNode = (node is IncludeMixinAtDeclaration)
       ? node.include
       : node as IncludeDirective;
@@ -559,7 +561,7 @@ int _findInclude(List list, TreeNode node) {
 /// parameters.
 class CallMixin extends Visitor {
   final MixinDefinition mixinDef;
-  List? _definedArgs;
+  List<TreeNode>? _definedArgs;
   Expressions? _currExpressions;
   int _currIndex = -1;
 
@@ -576,8 +578,8 @@ class CallMixin extends Visitor {
     }
   }
 
-  /// Given a mixin's defined arguments return a cloned mixin defintion that has
-  /// replaced all defined arguments with user's supplied VarUsages.
+  /// Given a mixin's defined arguments return a cloned mixin definition that
+  /// has replaced all defined arguments with user's supplied VarUsages.
   MixinDefinition transform(List<List<Expression>> callArgs) {
     // TODO(terry): Handle default arguments and varArgs.
     // Transform mixin with callArgs.
@@ -614,18 +616,16 @@ class CallMixin extends Visitor {
   }
 
   /// Rip apart var def with multiple parameters.
-  List<List<Expression>> _varDefsAsCallArgs(var callArg) {
+  List<List<Expression>> _varDefsAsCallArgs(List<Expression> callArg) {
     var defArgs = <List<Expression>>[];
-    if (callArg is List) {
-      var firstCallArg = callArg[0];
-      if (firstCallArg is VarUsage) {
-        var varDef = varDefs![firstCallArg.name];
-        var expressions = (varDef!.expression as Expressions).expressions;
-        assert(expressions.length > 1);
-        for (var expr in expressions) {
-          if (expr is! OperatorComma) {
-            defArgs.add([expr]);
-          }
+    var firstCallArg = callArg[0];
+    if (firstCallArg is VarUsage) {
+      var varDef = varDefs![firstCallArg.name];
+      var expressions = (varDef!.expression as Expressions).expressions;
+      assert(expressions.length > 1);
+      for (var expr in expressions) {
+        if (expr is! OperatorComma) {
+          defArgs.add([expr]);
         }
       }
     }
@@ -753,10 +753,10 @@ class DeclarationIncludes extends Visitor {
           var origRulesets = mixinDef.rulesets;
           var rulesets = <Declaration>[];
           if (origRulesets.every((ruleset) => ruleset is IncludeDirective)) {
-            origRulesets.forEach((ruleset) {
+            for (var ruleset in origRulesets) {
               rulesets.add(IncludeMixinAtDeclaration(
                   ruleset as IncludeDirective, ruleset.span));
-            });
+            }
             _IncludeReplacer.replace(_styleSheet!, node, rulesets);
           }
         }
@@ -872,7 +872,7 @@ class MixinsAndIncludes extends Visitor {
     MixinsAndIncludes().visitStyleSheet(styleSheet);
   }
 
-  bool _nodesToRemove(node) =>
+  bool _nodesToRemove(Object node) =>
       node is IncludeDirective || node is MixinDefinition || node is NoOp;
 
   @override
@@ -979,7 +979,7 @@ class InheritExtends extends Visitor {
           index++) {
         var simpleSeq = selectors.simpleSelectorSequences[index];
         var namePart = simpleSeq.simpleSelector.toString();
-        selectorName = (isLastNone) ? (selectorName + namePart) : namePart;
+        selectorName = isLastNone ? (selectorName + namePart) : namePart;
         var matches = _allExtends.inherits[selectorName];
         if (matches != null) {
           for (var match in matches) {

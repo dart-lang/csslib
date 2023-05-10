@@ -17,6 +17,7 @@ String treeToDebugString(StyleSheet styleSheet, [bool useSpan = false]) {
 class _TreePrinter extends Visitor {
   final TreeOutput output;
   final bool useSpan;
+
   _TreePrinter(this.output, this.useSpan) {
     output.printer = this;
   }
@@ -162,7 +163,7 @@ class _TreePrinter extends Visitor {
     output.depth++;
     output.writeValue('pseudo page', node._pseudoPage);
     super.visitPageDirective(node);
-    output.depth;
+    output.depth--;
   }
 
   @override
@@ -321,7 +322,7 @@ class _TreePrinter extends Visitor {
   void visitVarDefinition(VarDefinition node) {
     heading('Var', node);
     output.depth++;
-    output.write('defintion');
+    output.write('definition');
     super.visitVarDefinition(node);
     output.writeNode('expression', node.expression);
     output.depth--;

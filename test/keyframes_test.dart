@@ -1,3 +1,7 @@
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
 import 'package:csslib/src/messages.dart';
 import 'package:test/test.dart';
 
@@ -13,8 +17,8 @@ void main() {
     final expected = r'''
 @keyframes ping {
   75%, 100% {
-  transform: scale(2);
-  opacity: 0;
+    transform: scale(2);
+    opacity: 0;
   }
 }''';
     expect(prettyPrint(stylesheet), expected);

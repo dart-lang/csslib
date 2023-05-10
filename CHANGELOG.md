@@ -2,10 +2,12 @@
 
 - Add markdown badges to the readme.
 - Adopted `package:dart_flutter_team_lints` linting rules.
+- Addressed an issue parsing font names not surrounded by quotes.
 - Fixed the reported span for `Expression` nodes.
 - Fixed a regression parsing declaration values containing spaces.
 - Add support for `lh` and `rlh` units.
 - Refactor the package example.
+- Addressed an issue with the indent level of the `CssPrinter` output.
 - Require Dart 2.19.
 
 ## 0.17.2

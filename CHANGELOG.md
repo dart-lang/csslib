@@ -1,4 +1,4 @@
-## 0.17.3-wip
+## 0.17.3
 
 - Add markdown badges to the readme.
 - Adopted `package:dart_flutter_team_lints` linting rules.

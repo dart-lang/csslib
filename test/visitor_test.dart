@@ -2,8 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library visitor_test;
-
 import 'package:csslib/src/messages.dart';
 import 'package:csslib/visitor.dart';
 import 'package:test/test.dart';
@@ -11,7 +9,7 @@ import 'package:test/test.dart';
 import 'testing.dart';
 
 class ClassVisitor extends Visitor {
-  final List expectedClasses;
+  final List<String> expectedClasses;
   final foundClasses = <String>{};
 
   ClassVisitor(this.expectedClasses);
@@ -23,12 +21,12 @@ class ClassVisitor extends Visitor {
 
   bool get matches {
     var match = true;
-    foundClasses.forEach((value) {
+    for (var value in foundClasses) {
       match = match && expectedClasses.contains(value);
-    });
-    expectedClasses.forEach((value) {
+    }
+    for (var value in expectedClasses) {
       match = match && foundClasses.contains(value);
-    });
+    }
 
     return match;
   }
@@ -109,4 +107,34 @@ div.myComponent_xyzzy {
 void main() {
   test('Class Visitors', testClassVisitors);
   test('Polyfill', testPolyFill);
+  test('pretty-print', testPrettyPrint);
+}
+
+void testPrettyPrint() {
+  final input = '''
+.good { color: red; }
+@media screen { .better { color: blue; } }
+.best { color: green }''';
+
+  var styleSheet = parseCss(input);
+
+  // pretty print
+  expect(prettyPrint(styleSheet), '''
+.good {
+  color: #f00;
+}
+@media screen {
+  .better {
+    color: #00f;
+  }
+}
+.best {
+  color: #008000;
+}''');
+
+  // compact output
+  expect(compactOutput(styleSheet), '''
+.good{color:red}
+@media screen{.better{color:blue}}
+.best{color:green}''');
 }

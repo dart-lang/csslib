@@ -8,8 +8,8 @@ import 'preprocessor_options.dart';
 
 enum MessageLevel { info, warning, severe }
 
-// TODO(terry): Remove the global messages, use some object that tracks
-//              compilation state.
+// TODO(#159): Remove the global messages, use some object that tracks
+// compilation state.
 
 /// The global [Messages] for tracking info/warnings/messages.
 late Messages messages;
@@ -43,6 +43,16 @@ class Message {
 
   Message(this.level, this.message, {this.span, this.useColors = false});
 
+  String get describe {
+    var span = this.span;
+    if (span == null) {
+      return message;
+    }
+
+    var start = span.start;
+    return '${start.line + 1}:${start.column + 1}:$message';
+  }
+
   @override
   String toString() {
     var output = StringBuffer();
@@ -68,7 +78,7 @@ class Message {
 /// This class tracks and prints information, warnings, and errors emitted by
 /// the compiler.
 class Messages {
-  /// Called on every error. Set to blank function to supress printing.
+  /// Called on every error. Set to blank function to suppress printing.
   final void Function(Message obj) printHandler;
 
   final PreprocessorOptions options;
@@ -110,7 +120,7 @@ class Messages {
     if (options.verbose) printHandler(msg);
   }
 
-  /// Merge [newMessages] to this message lsit.
+  /// Merge [newMessages] to this message list.
   void mergeMessages(Messages newMessages) {
     messages.addAll(newMessages.messages);
     newMessages.messages

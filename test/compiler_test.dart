@@ -2,8 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library compiler_test;
-
 import 'dart:convert';
 
 import 'package:csslib/parser.dart';
@@ -653,20 +651,20 @@ void testHost() {
   expect(errors.isEmpty, true, reason: errors.toString());
   expect(prettyPrint(stylesheet), r'''
 @host {
-:scope {
-  white-space: nowrap;
-  overflow-style: marquee-line;
-  overflow-x: marquee;
-}
-* {
-  color: #f00;
-}
-*:hover {
-  font-weight: bold;
-}
-:nth-child(odd) {
-  color: #00f;
-}
+  :scope {
+    white-space: nowrap;
+    overflow-style: marquee-line;
+    overflow-x: marquee;
+  }
+  * {
+    color: #f00;
+  }
+  *:hover {
+    font-weight: bold;
+  }
+  :nth-child(odd) {
+    color: #00f;
+  }
 }''');
 }
 

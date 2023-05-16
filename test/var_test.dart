@@ -2,9 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library var_test;
-
 import 'package:csslib/src/messages.dart';
+import 'package:term_glyph/term_glyph.dart' as glyph;
 import 'package:test/test.dart';
 
 import 'testing.dart';
@@ -178,12 +177,12 @@ void expressionsVar() {
   content: var(content);
   text-shadow: var(text-shadow);
 }
-@font-face  {
+@font-face {
   font-family: var(font-family);
   src: var(src);
   unicode-range: var(unicode-range);
 }
-@font-face  {
+@font-face {
   font-family: var(font-family);
   src: var(src-1);
   unicode-range: var(unicode-range-1);
@@ -213,12 +212,12 @@ void expressionsVar() {
   content: "✔";
   text-shadow: 0 -1px 0 #bfbfbf;
 }
-@font-face  {
+@font-face {
   font-family: Gentium;
   src: url("http://example.com/fonts/Gentium.ttf");
   unicode-range: U+000-49F, U+2000-27FF, U+2900-2BFF, U+1D400-1D7FF;
 }
-@font-face  {
+@font-face {
   font-family: Gentium;
   src: local(Gentium Bold), local(Gentium-Bold), url("GentiumBold.ttf");
   unicode-range: U+0A-FF, U+980-9FF, U+????, U+3???;
@@ -404,40 +403,40 @@ void undefinedVars() {
 
   var errorStrings = [
     'error on line 5, column 14: Variable is not defined.\n'
-        '  ╷\n'
-        '5 │   var-a: var(b);\n'
-        '  │              ^^\n'
-        '  ╵',
+        '  ,\n'
+        '5 |   var-a: var(b);\n'
+        '  |              ^^\n'
+        '  \'',
     'error on line 6, column 14: Variable is not defined.\n'
-        '  ╷\n'
-        '6 │   var-b: var(c);\n'
-        '  │              ^^\n'
-        '  ╵',
+        '  ,\n'
+        '6 |   var-b: var(c);\n'
+        '  |              ^^\n'
+        '  \'',
     'error on line 9, column 16: Variable is not defined.\n'
-        '  ╷\n'
-        '9 │   var-one: var(two);\n'
-        '  │                ^^^^\n'
-        '  ╵',
+        '  ,\n'
+        '9 |   var-one: var(two);\n'
+        '  |                ^^^^\n'
+        '  \'',
     'error on line 12, column 17: Variable is not defined.\n'
-        '   ╷\n'
-        '12 │   var-four: var(five);\n'
-        '   │                 ^^^^^\n'
-        '   ╵',
+        '   ,\n'
+        '12 |   var-four: var(five);\n'
+        '   |                 ^^^^^\n'
+        '   \'',
     'error on line 13, column 17: Variable is not defined.\n'
-        '   ╷\n'
-        '13 │   var-five: var(six);\n'
-        '   │                 ^^^^\n'
-        '   ╵',
+        '   ,\n'
+        '13 |   var-five: var(six);\n'
+        '   |                 ^^^^\n'
+        '   \'',
     'error on line 16, column 18: Variable is not defined.\n'
-        '   ╷\n'
-        '16 │   var-def-1: var(def-2);\n'
-        '   │                  ^^^^^^\n'
-        '   ╵',
+        '   ,\n'
+        '16 |   var-def-1: var(def-2);\n'
+        '   |                  ^^^^^^\n'
+        '   \'',
     'error on line 17, column 18: Variable is not defined.\n'
-        '   ╷\n'
-        '17 │   var-def-2: var(def-3);\n'
-        '   │                  ^^^^^^\n'
-        '   ╵',
+        '   ,\n'
+        '17 |   var-def-2: var(def-3);\n'
+        '   |                  ^^^^^^\n'
+        '   \'',
   ];
 
   var generated = r'''
@@ -601,12 +600,12 @@ void parserVar() {
   content: var(content);
   text-shadow: var(text-shadow);
 }
-@font-face  {
+@font-face {
   font-family: var(font-family);
   src: var(src);
   unicode-range: var(unicode-range);
 }
-@font-face  {
+@font-face {
   font-family: var(font-family);
   src: var(src-1);
   unicode-range: var(unicode-range-1);
@@ -636,12 +635,12 @@ void parserVar() {
   content: "✔";
   text-shadow: 0 -1px 0 #bfbfbf;
 }
-@font-face  {
+@font-face {
   font-family: Gentium;
   src: url("http://example.com/fonts/Gentium.ttf");
   unicode-range: U+000-49F, U+2000-27FF, U+2900-2BFF, U+1D400-1D7FF;
 }
-@font-face  {
+@font-face {
   font-family: Gentium;
   src: local(Gentium Bold), local(Gentium-Bold), url("GentiumBold.ttf");
   unicode-range: U+0A-FF, U+980-9FF, U+????, U+3???;
@@ -666,7 +665,6 @@ void testVar() {
   final generated = '''
 var-color-background: #f00;
 var-color-foreground: #00f;
-
 .test {
   background-color: var(color-background);
   color: var(color-foreground);
@@ -691,7 +689,6 @@ var-color-foreground: #00f;
   final generated2 = '''
 var-color-background: #f00;
 var-color-foreground: #00f;
-
 .test {
   background-color: var(color-background);
   color: var(color-foreground);
@@ -719,7 +716,6 @@ void testLess() {
   final generated = '''
 var-color-background: #f00;
 var-color-foreground: #00f;
-
 .test {
   background-color: var(color-background);
   color: var(color-foreground);
@@ -744,7 +740,6 @@ var-color-foreground: #00f;
   final generated2 = '''
 var-color-background: #f00;
 var-color-foreground: #00f;
-
 .test {
   background-color: var(color-background);
   color: var(color-foreground);
@@ -943,6 +938,7 @@ void includes() {
 }
 
 void main() {
+  glyph.ascii = true;
   test('Simple var', simpleVar);
   test('Expressions var', expressionsVar);
   test('Default value in var()', defaultVar);

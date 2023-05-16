@@ -2,6 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+// ignore_for_file: constant_identifier_names
+
 part of '../parser.dart';
 
 // TODO(terry): Need to be consistent with tokens either they're ASCII tokens
@@ -139,6 +141,8 @@ class TokenKind {
   static const int UNIT_VIEWPORT_VH = 624;
   static const int UNIT_VIEWPORT_VMIN = 625;
   static const int UNIT_VIEWPORT_VMAX = 626;
+  static const int UNIT_LH = 627; // Computed height of the element.
+  static const int UNIT_RLH = 628; // Line height of the root element.
 
   // Directives (@nnnn)
   static const int DIRECTIVE_NONE = 640;
@@ -188,6 +192,7 @@ class TokenKind {
   static const int MARGIN_DIRECTIVE_RIGHTBOTTOM = 685;
 
   // Simple selector type.
+  // TODO: These are unused and should be removed in a future version.
   static const int CLASS_NAME = 700; // .class
   static const int ELEMENT_NAME = 701; // tagName
   static const int HASH_NAME = 702; // #elementId
@@ -196,7 +201,7 @@ class TokenKind {
   static const int PSEUDO_CLASS_NAME = 705; // :pseudoClass
   static const int NEGATION = 706; // NOT
 
-  static const List<Map<String, dynamic>> _DIRECTIVES = [
+  static const List<Map<String, Object>> _DIRECTIVES = [
     {'type': TokenKind.DIRECTIVE_IMPORT, 'value': 'import'},
     {'type': TokenKind.DIRECTIVE_MEDIA, 'value': 'media'},
     {'type': TokenKind.DIRECTIVE_PAGE, 'value': 'page'},
@@ -223,13 +228,13 @@ class TokenKind {
     {'type': TokenKind.DIRECTIVE_MS_VIEWPORT, 'value': '-ms-viewport'},
   ];
 
-  static const List<Map<String, dynamic>> MEDIA_OPERATORS = [
+  static const List<Map<String, Object>> MEDIA_OPERATORS = [
     {'type': TokenKind.MEDIA_OP_ONLY, 'value': 'only'},
     {'type': TokenKind.MEDIA_OP_NOT, 'value': 'not'},
     {'type': TokenKind.MEDIA_OP_AND, 'value': 'and'},
   ];
 
-  static const List<Map<String, dynamic>> MARGIN_DIRECTIVES = [
+  static const List<Map<String, Object>> MARGIN_DIRECTIVES = [
     {
       'type': TokenKind.MARGIN_DIRECTIVE_TOPLEFTCORNER,
       'value': 'top-left-corner'
@@ -260,7 +265,7 @@ class TokenKind {
     {'type': TokenKind.MARGIN_DIRECTIVE_RIGHTBOTTOM, 'value': 'right-bottom'},
   ];
 
-  static const List<Map<String, dynamic>> _UNITS = [
+  static const List<Map<String, Object>> _UNITS = [
     {'unit': TokenKind.UNIT_EM, 'value': 'em'},
     {'unit': TokenKind.UNIT_EX, 'value': 'ex'},
     {'unit': TokenKind.UNIT_LENGTH_PX, 'value': 'px'},
@@ -287,6 +292,8 @@ class TokenKind {
     {'unit': TokenKind.UNIT_VIEWPORT_VH, 'value': 'vh'},
     {'unit': TokenKind.UNIT_VIEWPORT_VMIN, 'value': 'vmin'},
     {'unit': TokenKind.UNIT_VIEWPORT_VMAX, 'value': 'vmax'},
+    {'unit': TokenKind.UNIT_LH, 'value': 'lh'},
+    {'unit': TokenKind.UNIT_RLH, 'value': 'rlh'},
   ];
 
   // Some more constants:
@@ -294,7 +301,7 @@ class TokenKind {
   static const int ASCII_UPPER_Z = 90; // ASCII value for uppercase Z
 
   // Extended color keywords:
-  static const List<Map> _EXTENDED_COLOR_NAMES = [
+  static const List<Map<String, Object>> _EXTENDED_COLOR_NAMES = [
     {'name': 'aliceblue', 'value': 0xF08FF},
     {'name': 'antiquewhite', 'value': 0xFAEBD7},
     {'name': 'aqua', 'value': 0x00FFFF},
@@ -451,24 +458,25 @@ class TokenKind {
   //              see http://www.w3schools.com/cssref/pr_list-style-type.asp
   //              for list of possible values.
 
-  /// Check if name is a pre-defined CSS name.  Used by error handler to report
-  /// if name is unknown or used improperly.
+  /// Check if a name is a pre-defined CSS name.
+  ///
+  /// This is used by the error handler to report if a name is unknown or used
+  /// improperly.
   static bool isPredefinedName(String name) {
-    var nameLen = name.length;
-    // TODO(terry): Add more pre-defined names (hidden, bolder, inherit, etc.).
-    if (matchUnits(name, 0, nameLen) == -1 ||
-        matchDirectives(name, 0, nameLen) == -1 ||
-        matchMarginDirectives(name, 0, nameLen) == -1 ||
-        matchColorName(name) == null) {
-      return false;
-    }
+    final len = name.length;
 
-    return true;
+    // TODO(terry): Add more pre-defined names (hidden, bolder, inherit, etc.).
+    if (matchColorName(name) != null) return true;
+    if (matchDirectives(name, 0, len) != -1) return true;
+    if (matchMarginDirectives(name, 0, len) != -1) return true;
+    if (matchUnits(name, 0, len) != -1) return true;
+
+    return false;
   }
 
   /// Return the token that matches the unit ident found.
-  static int matchList(Iterable<Map<String, dynamic>> identList,
-      String tokenField, String text, int offset, int length) {
+  static int matchList(List<Map<String, dynamic>> identList, String tokenField,
+      String text, int offset, int length) {
     for (final entry in identList) {
       final ident = entry['value'] as String;
 
@@ -518,8 +526,9 @@ class TokenKind {
     return matchList(MEDIA_OPERATORS, 'type', text, offset, length);
   }
 
-  static String? idToValue(var identList, int tokenId) {
+  static String? idToValue(Iterable<Object?> identList, int tokenId) {
     for (var entry in identList) {
+      entry as Map<String, Object?>;
       if (tokenId == entry['type']) {
         return entry['value'] as String?;
       }
@@ -545,8 +554,8 @@ class TokenKind {
   }
 
   /// Match color name, case insensitive match and return the associated color
-  /// entry from _EXTENDED_COLOR_NAMES list, return [:null:] if not found.
-  static Map? matchColorName(String text) {
+  /// entry from _EXTENDED_COLOR_NAMES list, return `null` if not found.
+  static Map<String, Object>? matchColorName(String text) {
     var name = text.toLowerCase();
     for (var color in _EXTENDED_COLOR_NAMES) {
       if (color['name'] == name) return color;
@@ -555,11 +564,11 @@ class TokenKind {
   }
 
   /// Return RGB value as [int] from a color entry in _EXTENDED_COLOR_NAMES.
-  static int colorValue(Map entry) {
+  static int colorValue(Map<String, Object> entry) {
     return entry['value'] as int;
   }
 
-  static String? hexToColorName(hexValue) {
+  static String? hexToColorName(Object hexValue) {
     for (final entry in _EXTENDED_COLOR_NAMES) {
       if (entry['value'] == hexValue) {
         return entry['name'] as String?;
@@ -570,17 +579,17 @@ class TokenKind {
   }
 
   static String decimalToHex(int number, [int minDigits = 1]) {
-    final _HEX_DIGITS = '0123456789abcdef';
+    final hexDigits = '0123456789abcdef';
 
     var result = <String>[];
 
     var dividend = number >> 4;
     var remain = number % 16;
-    result.add(_HEX_DIGITS[remain]);
+    result.add(hexDigits[remain]);
     while (dividend != 0) {
       remain = dividend % 16;
       dividend >>= 4;
-      result.add(_HEX_DIGITS[remain]);
+      result.add(hexDigits[remain]);
     }
 
     var invertResult = StringBuffer();
@@ -650,7 +659,7 @@ class TokenKind {
       case TokenKind.SINGLE_QUOTE:
         return "'";
       case TokenKind.DOUBLE_QUOTE:
-        return '\"';
+        return '"';
       case TokenKind.SLASH:
         return '/';
       case TokenKind.EQUALS:
@@ -668,7 +677,7 @@ class TokenKind {
       case TokenKind.BACKSLASH:
         return '\\';
       default:
-        throw 'Unknown TOKEN';
+        throw StateError('Unknown TOKEN');
     }
   }
 
@@ -707,6 +716,8 @@ class TokenKind {
       case TokenKind.UNIT_FREQ_HZ:
       case TokenKind.UNIT_FREQ_KHZ:
       case TokenKind.UNIT_FRACTION:
+      case TokenKind.UNIT_LH:
+      case TokenKind.UNIT_RLH:
         return true;
       default:
         return false;

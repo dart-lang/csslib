@@ -4,19 +4,26 @@
 
 part of '../parser.dart';
 
+// TODO: We should update the tokenization to follow what's described in the
+// spec: https://www.w3.org/TR/css-syntax-3/#tokenization.
+
 class Tokenizer extends TokenizerBase {
   /// U+ prefix for unicode characters.
+  // ignore: non_constant_identifier_names
   final UNICODE_U = 'U'.codeUnitAt(0);
+  // ignore: non_constant_identifier_names
   final UNICODE_LOWER_U = 'u'.codeUnitAt(0);
+  // ignore: non_constant_identifier_names
   final UNICODE_PLUS = '+'.codeUnitAt(0);
 
+  // ignore: non_constant_identifier_names
   final QUESTION_MARK = '?'.codeUnitAt(0);
 
   /// CDATA keyword.
+  // ignore: non_constant_identifier_names
   final List<int> CDATA_NAME = 'CDATA'.codeUnits;
 
-  Tokenizer(SourceFile file, String text, bool skipWhitespace, [int index = 0])
-      : super(file, text, skipWhitespace, index);
+  Tokenizer(super.file, super.text, super.skipWhitespace, [super.index]);
 
   @override
   Token next({bool unicodeRange = false}) {
@@ -72,6 +79,7 @@ class Tokenizer extends TokenizerBase {
             return _errorToken();
           }
 
+          // It's a number but it's preceded by a dot, so make it a double.
           _startIndex = start;
           return _finishToken(TokenKind.DOUBLE);
         }
@@ -284,7 +292,7 @@ class Tokenizer extends TokenizerBase {
         eatHexDigits(startHex + 6);
         if (_index != startHex) {
           // Parse the hex digits and add that character.
-          chars.add(int.parse('0x' + _text.substring(startHex, _index)));
+          chars.add(int.parse('0x${_text.substring(startHex, _index)}'));
 
           if (_index == _text.length) break;
 
@@ -474,13 +482,13 @@ class TokenizerHelpers {
   }
 
   static bool isDigit(int c) {
-    return (c >= 48 /*0*/ && c <= 57 /*9*/);
+    return c >= 48 /*0*/ && c <= 57 /*9*/;
   }
 
   static bool isHexDigit(int c) {
-    return (isDigit(c) ||
+    return isDigit(c) ||
         (c >= 97 /*a*/ && c <= 102 /*f*/) ||
-        (c >= 65 /*A*/ && c <= 70 /*F*/));
+        (c >= 65 /*A*/ && c <= 70 /*F*/);
   }
 
   static bool isIdentifierPart(int c) {
@@ -489,7 +497,7 @@ class TokenizerHelpers {
 
   /// Pseudo function expressions identifiers can't have a minus sign.
   static bool isIdentifierStartExpr(int c) {
-    return ((c >= 97 /*a*/ && c <= 122 /*z*/) ||
+    return (c >= 97 /*a*/ && c <= 122 /*z*/) ||
         (c >= 65 /*A*/ && c <= 90 /*Z*/) ||
         // Note: Unicode 10646 chars U+00A0 or higher are allowed, see:
         // http://www.w3.org/TR/CSS21/syndata.html#value-def-identifier
@@ -497,11 +505,11 @@ class TokenizerHelpers {
         // Also, escaped character should be allowed.
         c == 95 /*_*/ ||
         c >= 0xA0 ||
-        c == 92 /*\*/);
+        c == 92 /*\*/;
   }
 
   /// Pseudo function expressions identifiers can't have a minus sign.
   static bool isIdentifierPartExpr(int c) {
-    return (isIdentifierStartExpr(c) || isDigit(c));
+    return isIdentifierStartExpr(c) || isDigit(c);
   }
 }

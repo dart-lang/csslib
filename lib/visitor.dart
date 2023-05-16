@@ -86,6 +86,7 @@ abstract class VisitorBase {
   dynamic visitChTerm(ChTerm node);
   dynamic visitRemTerm(RemTerm node);
   dynamic visitViewportTerm(ViewportTerm node);
+  dynamic visitLineHeightTerm(LineHeightTerm node);
   dynamic visitFunctionTerm(FunctionTerm node);
   dynamic visitGroupTerm(GroupTerm node);
   dynamic visitItemTerm(ItemTerm node);
@@ -344,11 +345,12 @@ class Visitor implements VisitorBase {
   }
 
   @override
-  dynamic visitSimpleSelector(SimpleSelector node) => node._name.visit(this);
+  dynamic visitSimpleSelector(SimpleSelector node) =>
+      (node._name as TreeNode).visit(this);
 
   @override
   dynamic visitNamespaceSelector(NamespaceSelector node) {
-    if (node._namespace != null) node._namespace.visit(this);
+    if (node._namespace != null) (node._namespace as TreeNode).visit(this);
     if (node.nameAsSimpleSelector != null) {
       node.nameAsSimpleSelector!.visit(this);
     }
@@ -472,6 +474,11 @@ class Visitor implements VisitorBase {
 
   @override
   dynamic visitViewportTerm(ViewportTerm node) {
+    visitUnitTerm(node);
+  }
+
+  @override
+  dynamic visitLineHeightTerm(LineHeightTerm node) {
     visitUnitTerm(node);
   }
 

@@ -588,6 +588,29 @@ class _Parser {
         var charEncoding = processQuotedString(false);
         return CharsetDirective(charEncoding, _makeSpan(start));
 
+      case TokenKind.DIRECTIVE_COUNTER_STYLE:
+        // @counter-style <counter-style-name> { <declaration-list> }
+        //
+        // See https://www.w3.org/TR/css-counter-styles-3/
+        _next();
+
+        Identifier? name;
+        if (!_peekIdentifier()) {
+          _error('expected name after @counter-style', _peekToken.span);
+        }
+        name = identifier();
+
+        // <counter-style-name> is a <custom-ident> that is not an ASCII
+        // case-insensitive match for none.
+        if (name.name.toLowerCase() == 'none') {
+          _error('@counter-style name is a case-insensitive match for \'none\'',
+              name.span);
+        }
+
+        var declarations = processDeclarations();
+
+        return CounterStyleDirective(null, name, declarations);
+
       // TODO(terry): Workaround Dart2js bug continue not implemented in switch
       //              see https://code.google.com/p/dart/issues/detail?id=8270
       /*

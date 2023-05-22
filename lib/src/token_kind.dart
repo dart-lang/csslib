@@ -167,6 +167,7 @@ class TokenKind {
   static const int DIRECTIVE_SUPPORTS = 659;
   static const int DIRECTIVE_VIEWPORT = 660;
   static const int DIRECTIVE_MS_VIEWPORT = 661;
+  static const int DIRECTIVE_COUNTER_STYLE = 662;
 
   // Media query operators
   static const int MEDIA_OP_ONLY = 665; // Unary.
@@ -208,6 +209,7 @@ class TokenKind {
     {'type': TokenKind.DIRECTIVE_CHARSET, 'value': 'charset'},
     {'type': TokenKind.DIRECTIVE_STYLET, 'value': 'stylet'},
     {'type': TokenKind.DIRECTIVE_KEYFRAMES, 'value': 'keyframes'},
+    {'type': TokenKind.DIRECTIVE_COUNTER_STYLE, 'value': 'counter-style'},
     {
       'type': TokenKind.DIRECTIVE_WEB_KIT_KEYFRAMES,
       'value': '-webkit-keyframes'

@@ -1,3 +1,7 @@
+## 0.17.4-wip
+
+- Support the `@counter-style` directive.
+
 ## 0.17.3
 
 - Add markdown badges to the readme.

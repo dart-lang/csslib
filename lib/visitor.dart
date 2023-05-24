@@ -35,6 +35,7 @@ abstract class VisitorBase {
   dynamic visitKeyFrameDirective(KeyFrameDirective node);
   dynamic visitKeyFrameBlock(KeyFrameBlock node);
   dynamic visitFontFaceDirective(FontFaceDirective node);
+  dynamic visitCounterStyleDirective(CounterStyleDirective node);
   dynamic visitStyletDirective(StyletDirective node);
   dynamic visitNamespaceDirective(NamespaceDirective node);
   dynamic visitVarDefinitionDirective(VarDefinitionDirective node);
@@ -251,6 +252,12 @@ class Visitor implements VisitorBase {
 
   @override
   dynamic visitFontFaceDirective(FontFaceDirective node) {
+    visitDeclarationGroup(node._declarations);
+  }
+
+  @override
+  dynamic visitCounterStyleDirective(CounterStyleDirective node) {
+    visitIdentifier(node.name);
     visitDeclarationGroup(node._declarations);
   }
 

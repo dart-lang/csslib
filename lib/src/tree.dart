@@ -877,6 +877,21 @@ class FontFaceDirective extends Directive {
   dynamic visit(VisitorBase visitor) => visitor.visitFontFaceDirective(this);
 }
 
+class CounterStyleDirective extends Directive {
+  final Identifier name;
+  final DeclarationGroup _declarations;
+
+  CounterStyleDirective(super.span, this.name, this._declarations);
+
+  @override
+  CounterStyleDirective clone() =>
+      CounterStyleDirective(span, name, _declarations.clone());
+
+  @override
+  dynamic visit(VisitorBase visitor) =>
+      visitor.visitCounterStyleDirective(this);
+}
+
 class StyletDirective extends Directive {
   final String dartClassName;
   final List<TreeNode> rules;

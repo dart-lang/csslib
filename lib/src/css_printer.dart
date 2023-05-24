@@ -256,6 +256,14 @@ class CssPrinter extends Visitor {
   }
 
   @override
+  dynamic visitCounterStyleDirective(CounterStyleDirective node) {
+    emit('@counter-style ${node.name} ');
+    _emitLBrace();
+    node._declarations.visit(this);
+    _emitRBrace();
+  }
+
+  @override
   void visitImportDirective(ImportDirective node) {
     bool isStartingQuote(String ch) => '\'"'.contains(ch[0]);
 

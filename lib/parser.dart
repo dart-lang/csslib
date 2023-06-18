@@ -2852,9 +2852,9 @@ class ExpressionsProcessor {
     }
 
     return FontExpression(_exprs.span,
-        size: fontSize!.font.size,
-        lineHeight: fontSize.font.lineHeight,
-        family: fontFamily!.font.family);
+        size: fontSize?.font.size,
+        lineHeight: fontSize?.font.lineHeight,
+        family: fontFamily?.font.family);
   }
 }
 

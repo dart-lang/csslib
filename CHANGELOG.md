@@ -1,3 +1,7 @@
+## 1.0.1-dev
+
+- Update `processFont` to handle null expressions.
+
 ## 1.0.0
 
 - Rev to `1.0.0` (note however that there are no API changes from `0.17.x`).
